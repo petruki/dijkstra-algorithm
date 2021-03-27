@@ -29,7 +29,8 @@ public class DijkstraTable {
 		
 		for (Vertex v : input) {
 			addPatch(v.getNode1(), v.getNode2(), v.getDistance());
-			addPatch(v.getNode2(), v.getNode1(), v.getDistance());
+			if (v.isBidirectional())
+				addPatch(v.getNode2(), v.getNode1(), v.getDistance());
 		}
 	}
 	

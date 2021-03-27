@@ -27,6 +27,11 @@ public class Dijkstra {
 	public Dijkstra(List<Vertex> vertices) {
 		this.vertices = vertices;
 	}
+	
+	public Dijkstra(List<Vertex> vertices, String nodeOString) {
+		this.vertices = vertices;
+		generateTable(nodeOString);
+	}
 
 	/**
 	 * Generates table containing all shortest path for each node

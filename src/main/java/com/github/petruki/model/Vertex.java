@@ -5,11 +5,13 @@ public class Vertex {
 	private String node1;
 	private String node2;
 	private int distance;
+	private boolean bidirectional;
 	
-	public Vertex(String node1, String node2, int distance) {
+	public Vertex(String node1, String node2, int distance, boolean bidirectional) {
 		this.node1 = node1;
 		this.node2 = node2;
 		this.distance = distance;
+		this.bidirectional = bidirectional;
 	}
 	
 	public Vertex(String node1, String node2) {
@@ -22,13 +24,19 @@ public class Vertex {
 		this.node2 = neighbour;
 		this.distance = distance;
 	}
+	
+	public static Vertex get(
+			String node1, String node2, int distance, boolean bidirectional) {
+		return new Vertex(node1, node2, distance, bidirectional);
+	}
+	
+	public static Vertex get(
+			String node1, String node2, int distance) {
+		return new Vertex(node1, node2, distance, true);
+	}
 
 	public String getNode1() {
 		return node1;
-	}
-
-	public void setNode1(String node1) {
-		this.node1 = node1;
 	}
 
 	public String getNode2() {
@@ -49,6 +57,10 @@ public class Vertex {
 
 	public void setDistance(int distance) {
 		this.distance = distance;
+	}
+
+	public boolean isBidirectional() {
+		return bidirectional;
 	}
 
 	@Override

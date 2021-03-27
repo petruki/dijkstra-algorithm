@@ -20,9 +20,26 @@ public class DijkstraResult {
 
 	public String getResult() {
 		Vertex vertexDest = dTable.getVertex(nodeDestination);
+		
+		if (vertexDest == null) {
+			throw new RuntimeException("Destination cannot be reached");
+		}
+		
 		return String.format(RESULT_PATTERN, 
 				dTable.getNodeOrigin(), nodeDestination,
 				Arrays.toString(path.toArray()), vertexDest.getDistance());
+	}
+	
+	public void printResult() {
+		System.out.println(String.format("\n%s", getResult()));
+		dTable.getVertices().stream().map(v -> {
+			return v.toString()
+					.replace("node1", "vertex")
+					.replace("node2", "prev")
+					.replace("null", " ")
+					.replace("]", "")
+					.replace("Vertex [", "");
+		}).forEach(System.out::println);
 	}
 
 }
