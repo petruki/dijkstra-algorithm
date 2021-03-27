@@ -19,28 +19,19 @@ Based on behavior modeling, the implementation is modular enough to be viewed as
 
 > Scenario
 
-```java
-/*
- *				 3
- *            ----------
- *     2    /        3   \  
- * 	A ---- B      G ---- H
- * 	|	 / |      | \    |
- * 3|  4/  |2     |5 \2  |3
- * 	|  /   |      |   \  |
- * 	D ---- E ---- C ---- J
- *     1   	  2       7
- *     
- */   	 
-```
+![Scenario 1](https://raw.githubusercontent.com/petruki/dijkstra-algorithm/master/docs/scenario1.jpg)
 
 > Code
 
 ```java
 List<Vertex> vertices = Arrays.asList(
-	Vertex.get("A", "B", 2),
+	/*
+	 * B to A is not allowed
+	 * only A -> B
+	 */
+	Vertex.get("A", "B", 2, false),
 	Vertex.get("A", "D", 3),
-	Vertex.get("D", "B", 4),
+	Vertex.get("D", "B", 1),
 	Vertex.get("D", "E", 1),
 	Vertex.get("E", "B", 2),
 	Vertex.get("E", "C", 2),
@@ -57,8 +48,8 @@ List<Vertex> vertices = Arrays.asList(
 	Vertex.get("H", "J", 3, false)
 );
 
-Dijkstra dijkstra = new Dijkstra(vertices, "A");
-DijkstraResult result = dijkstra.getShortestPath("J");
+Dijkstra dijkstra = new Dijkstra(vertices, "J");
+DijkstraResult result = dijkstra.getShortestPath("A");
 
 result.pritnResult();
 ```
@@ -66,11 +57,11 @@ result.pritnResult();
 > Displays
 
 ```
-J -> A: [J, G, H, B, A] - cost: 10
-vertex=A, prev=B, distance=10
+J -> A: [J, G, H, B, D, A] - cost: 12
+vertex=A, prev=D, distance=12
 vertex=B, prev=H, distance=8
 vertex=C, prev=J, distance=7
-vertex=D, prev=E, distance=10
+vertex=D, prev=B, distance=9
 vertex=E, prev=C, distance=9
 vertex=G, prev=J, distance=2
 vertex=H, prev=G, distance=5
