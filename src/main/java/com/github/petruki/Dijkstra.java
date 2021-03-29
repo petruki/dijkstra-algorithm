@@ -41,9 +41,9 @@ public class Dijkstra {
 	public void generateTable(String nodeOrigin) {
 		dTable = new DijkstraTable(vertices, nodeOrigin);
 		
-		Vertex vertex = dTable.getVertexUnvisited();
-		for (;vertex != null; vertex = dTable.getVertexUnvisited()) {
-			calculateDistance(vertex);
+		Vertex vertex;
+		while((vertex = dTable.getVertexUnvisited()) != null) {
+			calculateShortestPath(vertex);
 		}
 	}
 	
@@ -53,12 +53,11 @@ public class Dijkstra {
 	 * @return DijkstraResult that can be used to query results from the execution
 	 */
 	public DijkstraResult getShortestPath(String nodeDestination) {
-		List<String> path = new ArrayList<>();
-		calcuteBestRoute(dTable.getNodeOrigin(), nodeDestination, path);
+		List<String> path = buildPathNodeList(dTable.getNodeOrigin(), nodeDestination);
 		return new DijkstraResult(path, dTable, nodeDestination);
 	}
 
-	private void calculateDistance(Vertex vertex) {
+	private void calculateShortestPath(Vertex vertex) {
 		for (Vertex edge : dTable.getPaths(vertex.getNode1())) {
 			Vertex adjacent = dTable.getAdjacent(edge.getNeighbour());
 			
@@ -79,20 +78,22 @@ public class Dijkstra {
 		return distance;
 	}
 	
-	private void calcuteBestRoute(
-			String nodeOrigin, String nodeDest, List<String> path) {
+	private List<String> buildPathNodeList(String nodeOrigin, String nodeDest) {
+		Vertex dsstVertex = dTable.getVertices().stream()
+				.filter(v -> v.getNode1().equals(nodeDest))
+				.findFirst().get();
 		
-		path.add(nodeDest);
-		
-		for (Vertex v : dTable.getVertices()) {
-			if (!nodeDest.equals(v.getNode1())) continue;
-			
-			if (nodeOrigin.equals(v.getNode2())) {
-				path.add(v.getNode2());
-			} else {
-				calcuteBestRoute(nodeOrigin, v.getNode2(), path);
-			}
+		if (nodeOrigin.equals(dsstVertex.getNode2())) {
+			List<String> path = new ArrayList<>();
+			path.add(dsstVertex.getNode2());
+			return path;
 		}
+		
+		List<String> path = buildPathNodeList(nodeOrigin, dsstVertex.getNode2());
+		if (!path.contains(dsstVertex.getNode2()))
+			path.add(dsstVertex.getNode2());
+		path.add(dsstVertex.getNode1());
+		return path;
 	}
 	
 }

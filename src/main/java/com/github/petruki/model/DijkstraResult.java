@@ -1,7 +1,6 @@
 package com.github.petruki.model;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class DijkstraResult {
@@ -12,7 +11,6 @@ public class DijkstraResult {
 	private String nodeDestination;
 
 	public DijkstraResult(List<String> path, DijkstraTable dTable, String nodeDestination) {
-		Collections.reverse(path);
 		this.path = path;
 		this.dTable = dTable;
 		this.nodeDestination = nodeDestination;
