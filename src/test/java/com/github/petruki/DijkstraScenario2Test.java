@@ -13,7 +13,8 @@ import com.github.petruki.model.Vertex;
 
 public class DijkstraScenario2Test {
 	
-	private List<Vertex> vertices;
+	private Dijkstra dijkstra;
+	
 	/*
 	 *				 3
      *            ----------
@@ -28,7 +29,7 @@ public class DijkstraScenario2Test {
 	 */   	 
 	@BeforeEach
 	void init() {  
-		vertices = Arrays.asList(
+		List<Vertex> vertices = Arrays.asList(
 			Vertex.get("A", "B", 2),
 			Vertex.get("A", "D", 3),
 			Vertex.get("D", "B", 4),
@@ -42,15 +43,17 @@ public class DijkstraScenario2Test {
 			Vertex.get("G", "J", 2),
 			Vertex.get("H", "J", 3)
 		);
+		
+		dijkstra = new Dijkstra(vertices);
 	}
 	
 	@Test
-	void testCaseAtoJ() {
+	void testCaseAtoJ() throws Exception {
 		//expected
 		String expected = "A -> J: [A, B, H, J] - cost: 8";
 		
 		//test
-		Dijkstra dijkstra = new Dijkstra(vertices, "A");
+		dijkstra.generateTable("A");
 		DijkstraResult result = dijkstra.getShortestPath("J");
 		
 		result.printResult();
@@ -58,12 +61,12 @@ public class DijkstraScenario2Test {
 	}
 	
 	@Test
-	void testCaseJtoA() {
+	void testCaseJtoA() throws Exception {
 		//expected
 		String expected = "J -> A: [J, H, B, A] - cost: 8";
 		
 		//test
-		Dijkstra dijkstra = new Dijkstra(vertices, "J");
+		dijkstra.generateTable("J");
 		DijkstraResult result = dijkstra.getShortestPath("A");
 		
 		result.printResult();
@@ -71,9 +74,9 @@ public class DijkstraScenario2Test {
 	}
 	
 	@Test
-	void testCaseJtoA_excludedRoute() {
+	void testCaseJtoA_excludedRoute() throws Exception {
 		//given
-		vertices = Arrays.asList(
+		List<Vertex> vertices = Arrays.asList(
 				Vertex.get("A", "B", 2),
 				Vertex.get("A", "D", 3),
 				Vertex.get("D", "B", 4),
@@ -93,11 +96,13 @@ public class DijkstraScenario2Test {
 				Vertex.get("H", "J", 3, false)
 			);
 		
+		Dijkstra dijkstra = new Dijkstra(vertices);
+		
 		//expected
 		String expected = "J -> A: [J, G, H, B, A] - cost: 10";
 		
 		//test
-		Dijkstra dijkstra = new Dijkstra(vertices, "J");
+		dijkstra.generateTable("J");
 		DijkstraResult result = dijkstra.getShortestPath("A");
 		
 		result.printResult();

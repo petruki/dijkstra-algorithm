@@ -15,7 +15,7 @@ public class DijkstraTable {
 	private List<String> visited;
 	private final String nodeOrigin;
 	
-	public DijkstraTable(List<Vertex> input, String nodeOrigin) {
+	public DijkstraTable(List<Vertex> input, String nodeOrigin) throws Exception {
 		this.nodeOrigin = nodeOrigin;
 		
 		initTable(input);
@@ -42,11 +42,11 @@ public class DijkstraTable {
 		paths.get(node).add(new Vertex(neighbour, distance));
 	}
 	
-	private void setNodeOrigin(String nodeOrigin) {
+	private void setNodeOrigin(String nodeOrigin) throws Exception {
 		verticesTable.stream()
 			.filter(v -> v.getNode1().equals(nodeOrigin))
 			.findFirst()
-			.get().setDistance(0);
+			.orElseThrow(() -> new Exception("Node not foud")).setDistance(0);
 	}
 	
 	public Vertex getVertexUnvisited() {

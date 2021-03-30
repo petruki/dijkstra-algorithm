@@ -1,6 +1,8 @@
 package com.github.petruki;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,7 +15,7 @@ import com.github.petruki.model.Vertex;
 
 public class DijkstraScenario1Test {
 	
-	private List<Vertex> vertices;
+	private Dijkstra dijkstra;
 
 	/*     6
 	 * 	A ---- B -\
@@ -25,7 +27,7 @@ public class DijkstraScenario1Test {
 	 */   	 
 	@BeforeEach
 	void init() {  
-		vertices = Arrays.asList(
+		List<Vertex> vertices = Arrays.asList(
 			Vertex.get("A", "B", 6),
 			Vertex.get("A", "D", 1),
 			Vertex.get("B", "D", 2),
@@ -33,15 +35,17 @@ public class DijkstraScenario1Test {
 			Vertex.get("B", "C", 5),
 			Vertex.get("D", "E", 1),
 			Vertex.get("E", "C", 5));
+		
+		dijkstra = new Dijkstra(vertices);
 	}
 	
 	@Test
-	void testCaseAtoC() {
+	void testCaseAtoC() throws Exception {
 		//expected
 		String expected = "A -> C: [A, D, E, C] - cost: 7";
 		
 		//test
-		Dijkstra dijkstra = new Dijkstra(vertices, "A");
+		dijkstra.generateTable("A");
 		DijkstraResult result = dijkstra.getShortestPath("C");
 		
 		result.printResult();
@@ -49,12 +53,12 @@ public class DijkstraScenario1Test {
 	}
 	
 	@Test
-	void testCaseCtoA() {
+	void testCaseCtoA() throws Exception {
 		//expected
 		String expected = "C -> A: [C, E, D, A] - cost: 7";
 		
 		//test
-		Dijkstra dijkstra = new Dijkstra(vertices, "C");
+		dijkstra.generateTable("C");
 		DijkstraResult result = dijkstra.getShortestPath("A");
 		
 		result.printResult();
@@ -62,12 +66,12 @@ public class DijkstraScenario1Test {
 	}
 	
 	@Test
-	void testCaseAtoB() {
+	void testCaseAtoB() throws Exception {
 		//expected
 		String expected = "A -> B: [A, D, B] - cost: 3";
 		
 		//test
-		Dijkstra dijkstra = new Dijkstra(vertices, "A");
+		dijkstra.generateTable("A");
 		DijkstraResult result = dijkstra.getShortestPath("B");
 		
 		result.printResult();
@@ -75,12 +79,12 @@ public class DijkstraScenario1Test {
 	}
 	
 	@Test
-	void testCaseBtoA() {
+	void testCaseBtoA() throws Exception {
 		//expected
 		String expected = "B -> A: [B, D, A] - cost: 3";
 		
 		//test
-		Dijkstra dijkstra = new Dijkstra(vertices, "B");
+		dijkstra.generateTable("B");
 		DijkstraResult result = dijkstra.getShortestPath("A");
 		
 		result.printResult();
@@ -88,16 +92,34 @@ public class DijkstraScenario1Test {
 	}
 	
 	@Test
-	void testCaseAtoE() {
+	void testCaseAtoE() throws Exception {
 		//expected
 		String expected = "A -> E: [A, D, E] - cost: 2";
 		
 		//test
-		Dijkstra dijkstra = new Dijkstra(vertices, "A");
+		dijkstra.generateTable("A");
 		DijkstraResult result = dijkstra.getShortestPath("E");
 		
 		result.printResult();
 		assertEquals(expected, result.getResult());
+	}
+	
+	@Test
+	void testInvalidOriginNode() {
+		Exception expectedExc = assertThrows(Exception.class, 
+				() -> dijkstra.generateTable("INVALID"));
+		
+		assertEquals(expectedExc.getMessage(), "Node not foud");
+	}
+	
+	@Test
+	void testInvalidDestinationNode() {
+		assertDoesNotThrow(() -> dijkstra.generateTable("A"));
+		
+		Exception expectedExc = assertThrows(Exception.class, 
+				() -> dijkstra.getShortestPath("INVALID_NODE"));
+		
+		assertEquals(expectedExc.getMessage(), "Destination node not found");
 	}
 
 }

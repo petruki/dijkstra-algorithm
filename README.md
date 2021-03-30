@@ -48,7 +48,8 @@ List<Vertex> vertices = Arrays.asList(
 	Vertex.get("H", "J", 3, false)
 );
 
-Dijkstra dijkstra = new Dijkstra(vertices, "J");
+Dijkstra dijkstra = new Dijkstra(vertices);
+dijkstra.generateTable("A");
 DijkstraResult result = dijkstra.getShortestPath("A");
 
 result.pritnResult();

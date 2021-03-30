@@ -28,17 +28,13 @@ public class Dijkstra {
 		this.vertices = vertices;
 	}
 	
-	public Dijkstra(List<Vertex> vertices, String nodeOString) {
-		this.vertices = vertices;
-		generateTable(nodeOString);
-	}
-
 	/**
 	 * Generates table containing all shortest path for each node
 	 * 
 	 * @param nodeOrigin which the algorithm should start calculating
+	 * @throws Exception 
 	 */
-	public void generateTable(String nodeOrigin) {
+	public void generateTable(String nodeOrigin) throws Exception {
 		dTable = new DijkstraTable(vertices, nodeOrigin);
 		
 		Vertex vertex;
@@ -51,8 +47,9 @@ public class Dijkstra {
 	 * Based on the generated table, find the shortest path
 	 * 
 	 * @return DijkstraResult that can be used to query results from the execution
+	 * @throws Exception 
 	 */
-	public DijkstraResult getShortestPath(String nodeDestination) {
+	public DijkstraResult getShortestPath(String nodeDestination) throws Exception {
 		List<String> path = buildPathNodeList(dTable.getNodeOrigin(), nodeDestination);
 		return new DijkstraResult(path, dTable, nodeDestination);
 	}
@@ -78,10 +75,12 @@ public class Dijkstra {
 		return distance;
 	}
 	
-	private List<String> buildPathNodeList(String nodeOrigin, String nodeDest) {
+	private List<String> buildPathNodeList(String nodeOrigin, String nodeDest) 
+			throws Exception {
+		
 		Vertex dsstVertex = dTable.getVertices().stream()
 				.filter(v -> v.getNode1().equals(nodeDest))
-				.findFirst().get();
+				.findFirst().orElseThrow(() -> new Exception("Destination node not found"));
 		
 		if (nodeOrigin.equals(dsstVertex.getNode2())) {
 			List<String> path = new ArrayList<>();
