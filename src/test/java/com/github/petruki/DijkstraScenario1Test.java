@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+import static com.github.petruki.model.Vertex.get;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,13 +30,13 @@ public class DijkstraScenario1Test {
 	@BeforeEach
 	void init() {  
 		List<Vertex> vertices = Arrays.asList(
-			Vertex.get("A", "B", 6),
-			Vertex.get("A", "D", 1),
-			Vertex.get("B", "D", 2),
-			Vertex.get("B", "E", 2),
-			Vertex.get("B", "C", 5),
-			Vertex.get("D", "E", 1),
-			Vertex.get("E", "C", 5));
+			get("A", "B", 6),
+			get("A", "D", 1),
+			get("B", "D", 2),
+			get("B", "E", 2),
+			get("B", "C", 5),
+			get("D", "E", 1),
+			get("E", "C", 5));
 		
 		dijkstra = new Dijkstra(vertices);
 	}

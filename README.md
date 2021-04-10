@@ -24,28 +24,30 @@ Based on behavior modeling, the implementation is modular enough to be viewed as
 > Code
 
 ```java
+import static com.github.petruki.model.Vertex.get;
+
 List<Vertex> vertices = Arrays.asList(
 	/*
 	 * B to A is not allowed
 	 * only A -> B
 	 */
-	Vertex.get("A", "B", 2, false),
-	Vertex.get("A", "D", 3),
-	Vertex.get("D", "B", 1),
-	Vertex.get("D", "E", 1),
-	Vertex.get("E", "B", 2),
-	Vertex.get("E", "C", 2),
-	Vertex.get("B", "H", 3),
-	Vertex.get("C", "J", 7),
-	Vertex.get("C", "G", 5),
-	Vertex.get("G", "H", 3),
-	Vertex.get("G", "J", 2),
+	get("A", "B", 2, false),
+	get("A", "D", 3),
+	get("D", "B", 1),
+	get("D", "E", 1),
+	get("E", "B", 2),
+	get("E", "C", 2),
+	get("B", "H", 3),
+	get("C", "J", 7),
+	get("C", "G", 5),
+	get("G", "H", 3),
+	get("G", "J", 2),
 	
 	/*
 	 * J to H is not allowed
 	 * only H -> J
 	 */
-	Vertex.get("H", "J", 3, false)
+	get("H", "J", 3, false)
 );
 
 Dijkstra dijkstra = new Dijkstra(vertices);

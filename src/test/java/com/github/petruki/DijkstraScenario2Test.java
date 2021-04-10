@@ -2,6 +2,8 @@ package com.github.petruki;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import static com.github.petruki.model.Vertex.get;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,18 +32,18 @@ public class DijkstraScenario2Test {
 	@BeforeEach
 	void init() {  
 		List<Vertex> vertices = Arrays.asList(
-			Vertex.get("A", "B", 2),
-			Vertex.get("A", "D", 3),
-			Vertex.get("D", "B", 4),
-			Vertex.get("D", "E", 1),
-			Vertex.get("E", "B", 2),
-			Vertex.get("E", "C", 2),
-			Vertex.get("B", "H", 3),
-			Vertex.get("C", "J", 7),
-			Vertex.get("C", "G", 5),
-			Vertex.get("G", "H", 3),
-			Vertex.get("G", "J", 2),
-			Vertex.get("H", "J", 3)
+			get("A", "B", 2),
+			get("A", "D", 3),
+			get("D", "B", 4),
+			get("D", "E", 1),
+			get("E", "B", 2),
+			get("E", "C", 2),
+			get("B", "H", 3),
+			get("C", "J", 7),
+			get("C", "G", 5),
+			get("G", "H", 3),
+			get("G", "J", 2),
+			get("H", "J", 3)
 		);
 		
 		dijkstra = new Dijkstra(vertices);
@@ -77,17 +79,17 @@ public class DijkstraScenario2Test {
 	void testCaseJtoA_excludedRoute() throws Exception {
 		//given
 		List<Vertex> vertices = Arrays.asList(
-				Vertex.get("A", "B", 2),
-				Vertex.get("A", "D", 3),
-				Vertex.get("D", "B", 4),
-				Vertex.get("D", "E", 1),
-				Vertex.get("E", "B", 2),
-				Vertex.get("E", "C", 2),
-				Vertex.get("B", "H", 3),
-				Vertex.get("C", "J", 7),
-				Vertex.get("C", "G", 5),
-				Vertex.get("G", "H", 3),
-				Vertex.get("G", "J", 2),
+				get("A", "B", 2),
+				get("A", "D", 3),
+				get("D", "B", 4),
+				get("D", "E", 1),
+				get("E", "B", 2),
+				get("E", "C", 2),
+				get("B", "H", 3),
+				get("C", "J", 7),
+				get("C", "G", 5),
+				get("G", "H", 3),
+				get("G", "J", 2),
 				
 				/*
 				 * J to H is not allowed
