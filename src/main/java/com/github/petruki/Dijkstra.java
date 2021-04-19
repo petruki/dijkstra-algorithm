@@ -14,10 +14,10 @@ import com.github.petruki.model.Vertex;
  * https://www.youtube.com/watch?v=pVfj6mxhdMw
  * 
  * This implementation offers a wide view of how the algorithm works.
- * Based on behavior modeling, the implementation is modular enough to be viewed as granular
- * version of the algorithm.
+ * I have added a few features that can make more complex scenarios such as unidirectional vertices and density matrix for pathfinder simulation.
  * 
  * @author Roger Floriano (petruki)
+ * @since 2021-04
  */
 public class Dijkstra {
 	
@@ -78,8 +78,6 @@ public class Dijkstra {
 		float distance = edge.getDistance() + vertex.getDistance();
 		
 		if (distance > 0 && adjacent.getDistance() > distance) {
-			System.out.printf(" [Update] calculate (%s) %s + (%s) %s = %s\n", 
-					vertex.getNode1(), vertex.getDistance(), edge.getNode2(), edge.getDistance(), distance);
 			adjacent.setDistance(distance);
 			adjacent.setNode2(vertex.getNode1());
 		}

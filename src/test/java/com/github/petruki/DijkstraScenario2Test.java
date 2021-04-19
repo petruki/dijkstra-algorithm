@@ -52,26 +52,26 @@ public class DijkstraScenario2Test {
 	@Test
 	void testCaseAtoJ() throws Exception {
 		//expected
-		String expected = "A -> J: [A, B, H, J] - cost: 8";
+		String expected = "A -> J: [A, B, H, J] - cost: 8.0";
 		
 		//test
 		dijkstra.generateTable("A");
 		DijkstraResult result = dijkstra.getShortestPath("J");
 		
-		result.printResult();
+		result.printResult(false);
 		assertEquals(expected, result.getResult());
 	}
 	
 	@Test
 	void testCaseJtoA() throws Exception {
 		//expected
-		String expected = "J -> A: [J, H, B, A] - cost: 8";
+		String expected = "J -> A: [J, H, B, A] - cost: 8.0";
 		
 		//test
 		dijkstra.generateTable("J");
 		DijkstraResult result = dijkstra.getShortestPath("A");
 		
-		result.printResult();
+		result.printResult(false);
 		assertEquals(expected, result.getResult());
 	}
 	
@@ -101,13 +101,13 @@ public class DijkstraScenario2Test {
 		Dijkstra dijkstra = new Dijkstra(vertices);
 		
 		//expected
-		String expected = "J -> A: [J, G, H, B, A] - cost: 10";
+		String expected = "J -> A: [J, G, H, B, A] - cost: 10.0";
 		
 		//test
 		dijkstra.generateTable("J");
 		DijkstraResult result = dijkstra.getShortestPath("A");
 		
-		result.printResult();
+		result.printResult(false);
 		assertEquals(expected, result.getResult());
 	}
 

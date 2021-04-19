@@ -50,7 +50,7 @@ public class DijkstraScenario1Test {
 		dijkstra.generateTable("A");
 		DijkstraResult result = dijkstra.getShortestPath("C");
 		
-		result.printResult();
+		result.printResult(false);
 		assertEquals(expected, result.getResult());
 	}
 	
@@ -63,7 +63,7 @@ public class DijkstraScenario1Test {
 		dijkstra.generateTable("C");
 		DijkstraResult result = dijkstra.getShortestPath("A");
 		
-		result.printResult();
+		result.printResult(false);
 		assertEquals(expected, result.getResult());
 	}
 	
@@ -76,7 +76,7 @@ public class DijkstraScenario1Test {
 		dijkstra.generateTable("A");
 		DijkstraResult result = dijkstra.getShortestPath("B");
 		
-		result.printResult();
+		result.printResult(false);
 		assertEquals(expected, result.getResult());
 	}
 	
@@ -89,7 +89,7 @@ public class DijkstraScenario1Test {
 		dijkstra.generateTable("B");
 		DijkstraResult result = dijkstra.getShortestPath("A");
 		
-		result.printResult();
+		result.printResult(false);
 		assertEquals(expected, result.getResult());
 	}
 	
@@ -102,7 +102,7 @@ public class DijkstraScenario1Test {
 		dijkstra.generateTable("A");
 		DijkstraResult result = dijkstra.getShortestPath("E");
 		
-		result.printResult();
+		result.printResult(false);
 		assertEquals(expected, result.getResult());
 	}
 	

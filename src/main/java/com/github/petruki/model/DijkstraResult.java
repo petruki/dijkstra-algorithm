@@ -28,16 +28,27 @@ public class DijkstraResult {
 				Arrays.toString(path.toArray()), vertexDest.getDistance());
 	}
 	
-	public void printResult() {
+	public void printResult(boolean printTable) {
 		System.out.println(String.format("\n%s", getResult()));
-		dTable.getVertices().stream().map(v -> {
-			return v.toString()
-					.replace("node1", "vertex")
-					.replace("node2", "prev")
-					.replace("null", " ")
-					.replace("]", "")
-					.replace("Vertex [", "");
-		}).forEach(System.out::println);
+		
+		if (printTable) {
+			dTable.getVertices().stream().map(v -> {
+				return v.toString()
+						.replace("node1", "vertex")
+						.replace("node2", "prev")
+						.replace("null", " ")
+						.replace("]", "")
+						.replace("Vertex [", "");
+			}).forEach(System.out::println);	
+		}
+	}
+
+	public List<String> getPath() {
+		return path;
+	}
+
+	public DijkstraTable getDTable() {
+		return dTable;
 	}
 
 }

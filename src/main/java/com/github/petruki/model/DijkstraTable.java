@@ -1,6 +1,7 @@
 package com.github.petruki.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,12 +13,15 @@ public class DijkstraTable {
 	
 	private Map<String, List<Vertex>> paths;
 	private Set<Vertex> verticesTable;
+	private Vertex[] sortedTable;
 	private List<String> visited;
+	private List<String> ignored;
 	private final String nodeOrigin;
 	
 	public DijkstraTable(List<Vertex> input, List<String> ignored, 
 			String nodeOrigin) throws Exception {
 		this.nodeOrigin = nodeOrigin;
+		this.ignored = ignored == null ? new ArrayList<>() : ignored;
 		
 		initTable(input, ignored);
 		setNodeOrigin(nodeOrigin);
@@ -57,11 +61,42 @@ public class DijkstraTable {
 	}
 	
 	public Vertex getVertexUnvisited() {
+		return getVertexUnvisited_v2();
+	}
+	
+	/**
+	 * Cleaner version of node/vertix search
+	 */
+	public Vertex getVertexUnvisited_v1() {
 		return verticesTable.stream()
-				.filter(v -> !visited.contains(v.getNode1()))
-				.min(Comparator.comparing(Vertex::getDistance))
-				.map(v -> { visited.add(v.getNode1()); return v; })
-				.orElse(null);
+			.filter(v -> !visited.contains(v.getNode1()))
+			.min(Comparator.comparing(Vertex::getDistance))
+			.map(v -> { visited.add(v.getNode1()); return v; })
+			.orElse(null);
+	}
+	
+	/**
+	 * This implementation can be +50% faster than the v1
+	 */
+	public Vertex getVertexUnvisited_v2() {
+		if (sortedTable == null)
+			sortedTable = verticesTable.toArray(new Vertex[0]);
+		
+		Arrays.parallelSort(sortedTable, this::compareDistance);
+		
+		for (Vertex v : sortedTable) {
+			if (!visited.contains(v.getNode1())) {
+				visited.add(v.getNode1());
+				return v;
+			}
+		}
+		
+		return null;
+	}
+	
+	public int compareDistance(Vertex v1, Vertex v2) {
+		return v1.getDistance() > v2.getDistance() ? 1 : 
+			v1.getDistance() == v2.getDistance() ? 0 : -1;
 	}
 	
 	public Vertex getVertex(String node) {
@@ -80,6 +115,10 @@ public class DijkstraTable {
 	
 	public List<Vertex> getPaths(String node) {
 		return paths.get(node);
+	}
+
+	public List<String> getIgnored() {
+		return ignored;
 	}
 
 	public Set<Vertex> getVertices() {
