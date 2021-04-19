@@ -35,7 +35,18 @@ public class Dijkstra {
 	 * @throws Exception 
 	 */
 	public void generateTable(String nodeOrigin) throws Exception {
-		dTable = new DijkstraTable(vertices, nodeOrigin);
+		this.generateTable(nodeOrigin, null);
+	}
+	
+	/**
+	 * Generates table containing all shortest path for each node
+	 * 
+	 * @param nodeOrigin which the algorithm should start calculating
+	 * @param ignored nodes
+	 * @throws Exception 
+	 */
+	public void generateTable(String nodeOrigin, List<String> ignored) throws Exception {
+		dTable = new DijkstraTable(vertices, ignored, nodeOrigin);
 		
 		Vertex vertex;
 		while((vertex = dTable.getVertexUnvisited()) != null) {
@@ -63,12 +74,12 @@ public class Dijkstra {
 		}
 	}
 
-	private int compareDistances(Vertex vertex, Vertex edge, Vertex adjacent) {
-		int distance = edge.getDistance() + vertex.getDistance();
+	private float compareDistances(Vertex vertex, Vertex edge, Vertex adjacent) {
+		float distance = edge.getDistance() + vertex.getDistance();
 		
-		if (distance < 0)
-			distance = Integer.MAX_VALUE;
-		else if (distance > 0 && adjacent.getDistance() > distance) {
+		if (distance > 0 && adjacent.getDistance() > distance) {
+			System.out.printf(" [Update] calculate (%s) %s + (%s) %s = %s\n", 
+					vertex.getNode1(), vertex.getDistance(), edge.getNode2(), edge.getDistance(), distance);
 			adjacent.setDistance(distance);
 			adjacent.setNode2(vertex.getNode1());
 		}

@@ -12,6 +12,7 @@ Based on behavior modeling, the implementation is modular enough to be viewed as
 
 - Pre-calculate Dijkstra table based on the origin node.
 - Vertices can be set as single or bidirectional for more complex scenarios.
+- Nodes can bet set to ignored to simulate path finder.
 - Display result table.
 - Display summary with visited nodes and total cost.
 
@@ -60,7 +61,7 @@ result.pritnResult();
 > Displays
 
 ```
-J -> A: [J, G, H, B, D, A] - cost: 12
+J -> A: [J, G, H, B, D, A] - cost: 12.0
 vertex=A, prev=D, distance=12
 vertex=B, prev=H, distance=8
 vertex=C, prev=J, distance=7

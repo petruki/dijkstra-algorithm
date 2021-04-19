@@ -4,10 +4,10 @@ public class Vertex {
 	
 	private String node1;
 	private String node2;
-	private int distance;
+	private float distance;
 	private boolean bidirectional;
 	
-	public Vertex(String node1, String node2, int distance, boolean bidirectional) {
+	public Vertex(String node1, String node2, float distance, boolean bidirectional) {
 		this.node1 = node1;
 		this.node2 = node2;
 		this.distance = distance;
@@ -20,18 +20,18 @@ public class Vertex {
 		this.distance = Integer.MAX_VALUE;
 	}
 	
-	public Vertex(String neighbour, int distance) {
+	public Vertex(String neighbour, float distance) {
 		this.node2 = neighbour;
 		this.distance = distance;
 	}
 	
 	public static Vertex get(
-			String node1, String node2, int distance, boolean bidirectional) {
+			String node1, String node2, float distance, boolean bidirectional) {
 		return new Vertex(node1, node2, distance, bidirectional);
 	}
 	
 	public static Vertex get(
-			String node1, String node2, int distance) {
+			String node1, String node2, float distance) {
 		return new Vertex(node1, node2, distance, true);
 	}
 
@@ -51,11 +51,11 @@ public class Vertex {
 		this.node2 = node2;
 	}
 
-	public int getDistance() {
+	public float getDistance() {
 		return distance;
 	}
 
-	public void setDistance(int distance) {
+	public void setDistance(float distance) {
 		this.distance = distance;
 	}
 

@@ -44,7 +44,7 @@ public class DijkstraScenario1Test {
 	@Test
 	void testCaseAtoC() throws Exception {
 		//expected
-		String expected = "A -> C: [A, D, E, C] - cost: 7";
+		String expected = "A -> C: [A, D, E, C] - cost: 7.0";
 		
 		//test
 		dijkstra.generateTable("A");
@@ -57,7 +57,7 @@ public class DijkstraScenario1Test {
 	@Test
 	void testCaseCtoA() throws Exception {
 		//expected
-		String expected = "C -> A: [C, E, D, A] - cost: 7";
+		String expected = "C -> A: [C, E, D, A] - cost: 7.0";
 		
 		//test
 		dijkstra.generateTable("C");
@@ -70,7 +70,7 @@ public class DijkstraScenario1Test {
 	@Test
 	void testCaseAtoB() throws Exception {
 		//expected
-		String expected = "A -> B: [A, D, B] - cost: 3";
+		String expected = "A -> B: [A, D, B] - cost: 3.0";
 		
 		//test
 		dijkstra.generateTable("A");
@@ -83,7 +83,7 @@ public class DijkstraScenario1Test {
 	@Test
 	void testCaseBtoA() throws Exception {
 		//expected
-		String expected = "B -> A: [B, D, A] - cost: 3";
+		String expected = "B -> A: [B, D, A] - cost: 3.0";
 		
 		//test
 		dijkstra.generateTable("B");
@@ -96,7 +96,7 @@ public class DijkstraScenario1Test {
 	@Test
 	void testCaseAtoE() throws Exception {
 		//expected
-		String expected = "A -> E: [A, D, E] - cost: 2";
+		String expected = "A -> E: [A, D, E] - cost: 2.0";
 		
 		//test
 		dijkstra.generateTable("A");

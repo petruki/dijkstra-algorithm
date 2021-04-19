@@ -15,26 +15,33 @@ public class DijkstraTable {
 	private List<String> visited;
 	private final String nodeOrigin;
 	
-	public DijkstraTable(List<Vertex> input, String nodeOrigin) throws Exception {
+	public DijkstraTable(List<Vertex> input, List<String> ignored, 
+			String nodeOrigin) throws Exception {
 		this.nodeOrigin = nodeOrigin;
 		
-		initTable(input);
+		initTable(input, ignored);
 		setNodeOrigin(nodeOrigin);
 	}
 	
-	private void initTable(List<Vertex> input) {
+	private void initTable(List<Vertex> input, List<String> ignored) {
 		paths = new HashMap<>();
 		verticesTable = new HashSet<>();
 		visited = new ArrayList<>();
 		
+		if (ignored == null)
+			ignored = new ArrayList<String>();
+		
 		for (Vertex v : input) {
+			if (ignored.contains(v.getNode1()) || ignored.contains(v.getNode2()))
+				continue;
+			
 			addPatch(v.getNode1(), v.getNode2(), v.getDistance());
 			if (v.isBidirectional())
 				addPatch(v.getNode2(), v.getNode1(), v.getDistance());
 		}
 	}
 	
-	private void addPatch(String node, String neighbour, int distance) {
+	private void addPatch(String node, String neighbour, float distance) {
 		verticesTable.add(new Vertex(node, null));
 		if (!paths.containsKey(node))
 			paths.put(node, new ArrayList<>());
