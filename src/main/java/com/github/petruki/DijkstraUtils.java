@@ -47,22 +47,22 @@ public class DijkstraUtils {
 		return vertices;
 	}
 	
-	public static void printResultDensityMatrix(DijkstraResult result, int size) {
+	public static void printResultDensityMatrix(DijkstraResult result, int size, boolean mask) {
 		Integer nodeId = 0;
 		String[][] matrix = new String[size][size];
 		for (int i = 0; i < matrix.length; i++) {
 			for (int j = 0; j < matrix[i].length; j++, nodeId++) {
 				if (result.getDTable().getIgnored().contains(nodeId.toString())) {
-					matrix[i][j] = "X";
+					matrix[i][j] = "[X]";
 				} else {
 					matrix[i][j] = result.getPath().contains(nodeId.toString()) ? 
-							String.format("[%s]", nodeId) : nodeId.toString();					
+							String.format("[%s]", mask ? "O" : nodeId) : mask ? "[-]" : nodeId.toString();					
 				}
 			}
 		}
 		
 		Arrays.stream(matrix).forEach(row -> {
-			Arrays.stream(row).forEach(col -> System.out.printf("%6s", col));
+			Arrays.stream(row).forEach(col -> System.out.printf(mask ? "%3s" : "%6s", col));
 			System.out.println();
 		});
 	}

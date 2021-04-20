@@ -96,7 +96,7 @@ DijkstraResult result = dijkstra.getShortestPath("79");
 result.printResult(false);
 
 // Print result desity matrix
-DijkstraUtils.printResultDensityMatrix(result, 10);
+DijkstraUtils.printResultDensityMatrix(result, 10, false);
 ```
 
 #### **Output**
@@ -111,9 +111,24 @@ DijkstraUtils.printResultDensityMatrix(result, 10);
     20    21    22    23    24    25    26    27    28    29
     30    31    32    33    34    35    36    37    38    39
     40    41    42    43    44    45    46    47    48    49
-    50    51    52    53    54     X     X  [57]    58    59
-    60    61    62    63  [64]     X  [66]     X  [68]    69
-    70    71    72  [73]     X  [75]     X    77     X  [79]
-    80    81    82  [83]     X     X     X     X     X     X
+    50    51    52    53    54   [X]   [X]  [57]    58    59
+    60    61    62    63  [64]   [X]  [66]   [X]  [68]    69
+    70    71    72  [73]   [X]  [75]   [X]    77   [X]  [79]
+    80    81    82  [83]   [X]   [X]   [X]   [X]   [X]   [X]
     90    91    92    93  [94]  [95]  [96]  [97]  [98]  [99]
+```
+
+The last parameter of 'DijkstraUtils.printResultDensityMatrix' can print the matrix in a more visual way, which is interesting for maze simulations.
+
+```
+[O][O][O][-][X][-][-][-][-][-]
+[-][X][O][O][X][-][-][-][-][-]
+[-][-][X][O][X][X][-][-][-][-]
+[X][X][X][O][-][X][-][-][-][-]
+[X][O][O][O][X][X][O][O][O][-]
+[O][O][X][X][X][O][O][X][O][-]
+[O][X][X][O][O][O][-][X][O][X]
+[O][X][O][O][-][-][-][X][O][O]
+[O][O][O][-][-][-][X][X][X][O]
+[-][-][-][-][-][-][X][O][O][O]
 ```
