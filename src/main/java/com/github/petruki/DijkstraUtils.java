@@ -11,36 +11,46 @@ import com.github.petruki.model.Vertex;
 
 public class DijkstraUtils {
 	
-	public static List<Vertex> generateDensityMatrix(int size, float linearCost, float diagCost) {
-		List<Vertex> vertices = new ArrayList<>();
+	public static List<Vertex> generateDensityMatrix(
+			int size, float linearCost, float diagCost) {
 		
 		Integer nodeId = 0;
-		Integer[][] matrix = new Integer[size][size];
+		String[][] matrix = new String[size][size];
+		
 		for (int i = 0; i < matrix.length; i++) {
 			for (int j = 0; j < matrix[i].length; j++) {
-				matrix[i][j] = nodeId++;
+				matrix[i][j] = String.valueOf(nodeId++);
 			}
 		}
 		
+		return generateDensityMatrix(matrix, linearCost, diagCost);
+	}
+	
+	public static List<Vertex> generateDensityMatrix(
+			String[][] matrix, float linearCost, float diagCost) {
+		
+		List<Vertex> vertices = new ArrayList<>();
+		int size = matrix.length;
+		
 		for (int i = 0; i < matrix.length; i++) {
-			for (int j = 0; j < matrix[i].length; j++, nodeId++) {
+			for (int j = 0; j < matrix[i].length; j++) {
 				if (i > 0) {
-					vertices.add(get(matrix[i][j].toString(), matrix[i-1][j].toString(), linearCost));
+					vertices.add(get(matrix[i][j], matrix[i-1][j], linearCost));
 					
 					if (j + 1 < size)
-						vertices.add(get(matrix[i][j].toString(), matrix[i-1][j+1].toString(), diagCost));	
+						vertices.add(get(matrix[i][j], matrix[i-1][j+1], diagCost));	
 				}
 				
 				if (j + 1 < size) {
-					vertices.add(get(matrix[i][j].toString(), matrix[i][j+1].toString(), linearCost));
+					vertices.add(get(matrix[i][j], matrix[i][j+1], linearCost));
 				
 					if (i + 1 < size)
-						vertices.add(get(matrix[i][j].toString(), matrix[i+1][j+1].toString(), diagCost));
+						vertices.add(get(matrix[i][j], matrix[i+1][j+1], diagCost));
 				}
 				
 				
 				if (i + 1 < size)
-					vertices.add(get(matrix[i][j].toString(), matrix[i+1][j].toString(), linearCost));
+					vertices.add(get(matrix[i][j], matrix[i+1][j], linearCost));
 			}
 		}
 		
