@@ -22,6 +22,8 @@ public class FileManagement {
 		
 		@Override
 		public boolean accept(File f) {
+			if (f.isDirectory())
+				return true;
 			return f.getName().toLowerCase().endsWith(".dmf");
 		}
 	};
