@@ -17,6 +17,10 @@ I have added a few features that can make more complex scenarios such as unidire
 - Display result table.
 - Display summary with visited nodes and total cost.
 
+#### Density Matrix Simulator App
+
+- Create and run Density Matrix simulations using the Desktop UI.
+
 ### Running
 
 > Scenario

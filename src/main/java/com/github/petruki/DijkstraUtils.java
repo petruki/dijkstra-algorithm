@@ -37,14 +37,14 @@ public class DijkstraUtils {
 				if (i > 0) {
 					vertices.add(get(matrix[i][j], matrix[i-1][j], linearCost));
 					
-					if (j + 1 < size)
+					if (j + 1 < size && diagCost > 0)
 						vertices.add(get(matrix[i][j], matrix[i-1][j+1], diagCost));	
 				}
 				
 				if (j + 1 < size) {
 					vertices.add(get(matrix[i][j], matrix[i][j+1], linearCost));
 				
-					if (i + 1 < size)
+					if (i + 1 < size && diagCost > 0)
 						vertices.add(get(matrix[i][j], matrix[i+1][j+1], diagCost));
 				}
 				
