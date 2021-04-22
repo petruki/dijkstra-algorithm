@@ -1,4 +1,4 @@
-package com.github.petruki.ui.model;
+package com.github.petruki.app.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;

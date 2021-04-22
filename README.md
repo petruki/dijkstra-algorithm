@@ -136,3 +136,9 @@ The last parameter of 'DijkstraUtils.printResultDensityMatrix' can print the mat
 [O][O][O][-][-][-][X][X][X][O]
 [-][-][-][-][-][-][X][O][O][O]
 ```
+
+#### **Density Matrix App**
+
+Create simulations based on Density Matrix scenarios or open the sampe included in this project located at: savedwork/demo1.dmf
+
+![Density Matrix Sample](https://raw.githubusercontent.com/petruki/dijkstra-algorithm/master/docs/density_matrix_app.jpg)

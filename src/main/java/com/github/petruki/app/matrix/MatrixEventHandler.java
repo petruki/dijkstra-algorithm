@@ -1,11 +1,11 @@
-package com.github.petruki.ui.matrix;
+package com.github.petruki.app.matrix;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JTable;
 
-import com.github.petruki.ui.model.MatrixVertex;
+import com.github.petruki.app.model.MatrixVertex;
 
 public abstract class MatrixEventHandler extends MouseAdapter {
 	

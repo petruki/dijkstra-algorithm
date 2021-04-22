@@ -1,4 +1,4 @@
-package com.github.petruki.ui.matrix;
+package com.github.petruki.app.matrix;
 
 import javax.swing.table.DefaultTableModel;
 

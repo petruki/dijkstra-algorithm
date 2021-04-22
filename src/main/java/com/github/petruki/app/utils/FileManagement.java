@@ -1,4 +1,4 @@
-package com.github.petruki.ui.utils;
+package com.github.petruki.app.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,7 +10,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
-import com.github.petruki.ui.model.MatrixSettings;
+import com.github.petruki.app.model.MatrixSettings;
 
 public class FileManagement {
 	
@@ -32,6 +32,7 @@ public class FileManagement {
 		fileChooser.setDialogTitle("Open saved work");
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.setAcceptAllFileFilterUsed(false);
+		fileChooser.setCurrentDirectory(new File("./savedwork"));
 		fileChooser.setFileFilter(fileFilter);
 		int result = fileChooser.showOpenDialog(fileChooser);
 		
@@ -60,6 +61,7 @@ public class FileManagement {
 		fileChooser.setDialogTitle("Save your work");
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.setAcceptAllFileFilterUsed(false);
+		fileChooser.setCurrentDirectory(new File("./savedwork"));
 		fileChooser.setFileFilter(fileFilter);
 		int result = fileChooser.showSaveDialog(fileChooser);
 		

@@ -1,4 +1,4 @@
-package com.github.petruki.ui;
+package com.github.petruki.app;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -14,6 +14,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
@@ -25,23 +26,26 @@ import javax.swing.border.EmptyBorder;
 
 import com.github.petruki.Dijkstra;
 import com.github.petruki.DijkstraUtils;
+import com.github.petruki.app.matrix.MatrixEventHandler;
+import com.github.petruki.app.matrix.MatrixModel;
+import com.github.petruki.app.matrix.MatrixRender;
+import com.github.petruki.app.model.MatrixSettings;
+import com.github.petruki.app.model.MatrixVertex;
+import com.github.petruki.app.model.Options;
+import com.github.petruki.app.utils.FileManagement;
+import com.github.petruki.app.utils.LoadImage;
 import com.github.petruki.model.DijkstraResult;
 import com.github.petruki.model.Vertex;
-import com.github.petruki.ui.matrix.MatrixEventHandler;
-import com.github.petruki.ui.matrix.MatrixModel;
-import com.github.petruki.ui.matrix.MatrixRender;
-import com.github.petruki.ui.model.MatrixSettings;
-import com.github.petruki.ui.model.MatrixVertex;
-import com.github.petruki.ui.model.Options;
-import com.github.petruki.ui.utils.FileManagement;
+
+import javax.swing.JTextField;
 
 /**
- * Simple app that displays the Density Matrix mode using Dijkstra
+ * Simple app that displays the Density Matrix simulation using the Dijkstra algorithm
  * 
  * @author Roger Floriano (petruki)
  */
 @SuppressWarnings("serial")
-public class DensityMatrixSimulatorApp extends JFrame {
+public class DensityMatrixApp extends JFrame {
 
 	private JButton btnGenerate;
 	private JButton btnExecute;
@@ -56,9 +60,11 @@ public class DensityMatrixSimulatorApp extends JFrame {
 	
 	private Dijkstra dijkstra;
 	private Options optionSelected = Options.UNSELECTED;
+	private JTextField txtTotalCost;
 	
-	public DensityMatrixSimulatorApp() {
-		setTitle("Density Matrix - Dijkstra Pathfinder");
+	public DensityMatrixApp() {
+		setTitle("Density Matrix Simulator - Dijkstra Pathfinder");
+		setIconImage(LoadImage.load("end.png"));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 678, 560);
 		contentPane = new JPanel();
@@ -82,7 +88,8 @@ public class DensityMatrixSimulatorApp extends JFrame {
 		JButton btnOpen = new JButton("Open");
 		btnOpen.addActionListener(e -> {
 			matrixSettings = FileManagement.openReadWork();
-			initializeMatrix(false);
+			if (matrixSettings != null)
+				initializeMatrix(false);
 		});
 		panel.add(btnOpen);
 		
@@ -98,6 +105,11 @@ public class DensityMatrixSimulatorApp extends JFrame {
 		btnExecute.setEnabled(false);
 		btnExecute.addActionListener(e -> onExecute());
 		panel.add(btnExecute);
+		
+		txtTotalCost = new JTextField();
+		txtTotalCost.setEditable(false);
+		panel.add(txtTotalCost);
+		txtTotalCost.setColumns(10);
 		
 		matrixSize = new JSpinner();
 		matrixSize.setValue(30);
@@ -118,16 +130,13 @@ public class DensityMatrixSimulatorApp extends JFrame {
 		contentPane.add(toolBar, BorderLayout.WEST);
 		
 		JButton btnSelectStartNode = new JButton();
-		btnSelectStartNode.setIcon(new ImageIcon(
-				getClass().getClassLoader().getResource("start.png")));
+		btnSelectStartNode.setIcon(new ImageIcon(LoadImage.load("start.png")));
 
 		JButton btnSelectEndNode = new JButton();
-		btnSelectEndNode.setIcon(new ImageIcon(
-				getClass().getClassLoader().getResource("end.png")));
+		btnSelectEndNode.setIcon(new ImageIcon(LoadImage.load("end.png")));
 
 		JButton btnSelectIgnoreNode = new JButton();
-		btnSelectIgnoreNode.setIcon(new ImageIcon(
-				getClass().getClassLoader().getResource("ignore.png")));
+		btnSelectIgnoreNode.setIcon(new ImageIcon(LoadImage.load("ignore.png")));
 
 		btnSelectStartNode.setToolTipText("Select the starting node");
 		btnSelectStartNode.setFocusable(false);
@@ -164,9 +173,10 @@ public class DensityMatrixSimulatorApp extends JFrame {
 		matrix.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		matrix.setBackground(Color.GRAY);
 		matrix.setGridColor(Color.GRAY);
+		matrix.setTableHeader(null);
 		matrix.setShowGrid(true);
-		
-		contentPane.add(matrix, BorderLayout.CENTER);
+
+		contentPane.add(new JScrollPane(matrix), BorderLayout.CENTER);
 		
 		centerUI();
 		initializeMatrix(true);
@@ -206,6 +216,7 @@ public class DensityMatrixSimulatorApp extends JFrame {
 				
 				// reset view
 				btnGenerate.setEnabled(true);
+				txtTotalCost.setText("");
 			}
 		});
 	}
@@ -219,7 +230,7 @@ public class DensityMatrixSimulatorApp extends JFrame {
 					btnExecute.setEnabled(true);
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(
-							DensityMatrixSimulatorApp.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+							DensityMatrixApp.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -232,10 +243,11 @@ public class DensityMatrixSimulatorApp extends JFrame {
 				try {
 					result = dijkstra.getShortestPath(matrixSettings.getNodeEnd());
 					matrixSettings.updatePath(result.getPath());
+					txtTotalCost.setText(result.getResult());
 					matrix.repaint();
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(
-							DensityMatrixSimulatorApp.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+							DensityMatrixApp.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -284,7 +296,7 @@ public class DensityMatrixSimulatorApp extends JFrame {
 				            break;
 				        }
 				    }
-					new DensityMatrixSimulatorApp().setVisible(true);
+					new DensityMatrixApp().setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

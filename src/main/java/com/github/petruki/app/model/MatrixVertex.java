@@ -1,4 +1,4 @@
-package com.github.petruki.ui.model;
+package com.github.petruki.app.model;
 
 public class MatrixVertex {
 	

@@ -1,4 +1,4 @@
-package com.github.petruki.ui.matrix;
+package com.github.petruki.app.matrix;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -7,8 +7,8 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-import com.github.petruki.ui.model.MatrixSettings;
-import com.github.petruki.ui.model.Options;
+import com.github.petruki.app.model.MatrixSettings;
+import com.github.petruki.app.model.Options;
 
 public class MatrixRender implements TableCellRenderer {
 
