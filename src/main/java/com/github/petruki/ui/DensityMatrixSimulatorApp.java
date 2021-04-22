@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BoxLayout;
@@ -31,8 +30,10 @@ import com.github.petruki.model.Vertex;
 import com.github.petruki.ui.matrix.MatrixEventHandler;
 import com.github.petruki.ui.matrix.MatrixModel;
 import com.github.petruki.ui.matrix.MatrixRender;
+import com.github.petruki.ui.model.MatrixSettings;
 import com.github.petruki.ui.model.MatrixVertex;
 import com.github.petruki.ui.model.Options;
+import com.github.petruki.ui.utils.FileManagement;
 
 /**
  * Simple app that displays the Density Matrix mode using Dijkstra
@@ -48,12 +49,10 @@ public class DensityMatrixSimulatorApp extends JFrame {
 	private JCheckBox chkDiagonalTrip;
 	private JPanel contentPane;
 	private JTable matrix;
-	private MatrixModel matrixModel;
 	private MatrixRender matrixRender;
 	
 	private List<Vertex> densityMatrix;
-	private List<String> ignoredNodes = new ArrayList<>();
-	private List<String> path = new ArrayList<>();
+	private MatrixSettings matrixSettings;
 	
 	private Dijkstra dijkstra;
 	private Options optionSelected = Options.UNSELECTED;
@@ -76,16 +75,19 @@ public class DensityMatrixSimulatorApp extends JFrame {
 		contentPane.add(panel, BorderLayout.SOUTH);
 		
 		JButton btnNew = new JButton("New");
-		btnNew.addActionListener(e -> initializeMatrix());
+		btnNew.addActionListener(e -> initializeMatrix(true));
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		panel.add(btnNew);
 		
 		JButton btnOpen = new JButton("Open");
-		btnOpen.setEnabled(false);
+		btnOpen.addActionListener(e -> {
+			matrixSettings = FileManagement.openReadWork();
+			initializeMatrix(false);
+		});
 		panel.add(btnOpen);
 		
 		JButton btnSave = new JButton("Save");
-		btnSave.setEnabled(false);
+		btnSave.addActionListener(e -> FileManagement.openSaveWork(matrixSettings));
 		panel.add(btnSave);
 		
 		btnGenerate = new JButton("Generate");
@@ -117,15 +119,15 @@ public class DensityMatrixSimulatorApp extends JFrame {
 		
 		JButton btnSelectStartNode = new JButton();
 		btnSelectStartNode.setIcon(new ImageIcon(
-				DensityMatrixSimulatorApp.class.getClassLoader().getResource("start.png")));
+				getClass().getClassLoader().getResource("start.png")));
 
 		JButton btnSelectEndNode = new JButton();
 		btnSelectEndNode.setIcon(new ImageIcon(
-				DensityMatrixSimulatorApp.class.getClassLoader().getResource("end.png")));
+				getClass().getClassLoader().getResource("end.png")));
 
 		JButton btnSelectIgnoreNode = new JButton();
 		btnSelectIgnoreNode.setIcon(new ImageIcon(
-				DensityMatrixSimulatorApp.class.getClassLoader().getResource("ignore.png")));
+				getClass().getClassLoader().getResource("ignore.png")));
 
 		btnSelectStartNode.setToolTipText("Select the starting node");
 		btnSelectStartNode.setFocusable(false);
@@ -167,20 +169,28 @@ public class DensityMatrixSimulatorApp extends JFrame {
 		contentPane.add(matrix, BorderLayout.CENTER);
 		
 		centerUI();
-		initializeMatrix();
+		initializeMatrix(true);
 		initMatrixEventHandler();
 	}
 	
-	private void initializeMatrix() {
+	private void initializeMatrix(boolean newWork) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				// configure matrix
-				int selectedMatrixSize = Integer.valueOf(matrixSize.getValue().toString());
-				float diagonalTrip = chkDiagonalTrip.isSelected() ? 1.2f : -1;
+				if (newWork) {
+					matrixSettings = new MatrixSettings(
+							Integer.valueOf(matrixSize.getValue().toString()),
+							chkDiagonalTrip.isSelected() ? 1.2f : -1);
+					
+					matrixSettings.resetMatrix();
+				} else {
+					matrixSize.setValue(matrixSettings.getSize());
+					chkDiagonalTrip.setSelected(matrixSettings.getDiagonalTrip() != -1);
+				}
 				
 				// initialize node ids
 				Integer nodeId = 0;
-				String[][] matrixIds = new String[selectedMatrixSize][selectedMatrixSize];
+				String[][] matrixIds = new String[matrixSettings.getSize()][matrixSettings.getSize()];
 				for (int i = 0; i < matrixIds.length; i++) {
 					for (int j = 0; j < matrixIds[i].length; j++) {
 						matrixIds[i][j] = String.valueOf(nodeId++);
@@ -188,17 +198,14 @@ public class DensityMatrixSimulatorApp extends JFrame {
 				}
 				
 				densityMatrix = DijkstraUtils.generateDensityMatrix(
-						matrixIds, 1f, diagonalTrip);
+						matrixIds, 1f, matrixSettings.getDiagonalTrip());
 				
 				// initialize view
-				matrixModel = new MatrixModel();
-				matrix.setModel(matrixModel.getTableModel(matrixIds));
-				matrixRender = new MatrixRender(matrix, ignoredNodes, path);
+				matrix.setModel(new MatrixModel().getTableModel(matrixIds));
+				matrixRender = new MatrixRender(matrix, matrixSettings);
 				
 				// reset view
 				btnGenerate.setEnabled(true);
-				ignoredNodes.clear();
-				path.clear();
 			}
 		});
 	}
@@ -208,7 +215,7 @@ public class DensityMatrixSimulatorApp extends JFrame {
 			public void run() {
 				try {
 					dijkstra = new Dijkstra(densityMatrix);
-					dijkstra.generateTable(matrixRender.getNodeStart(), ignoredNodes);
+					dijkstra.generateTable(matrixSettings.getNodeStart(), matrixSettings.getIgnoredNodes());
 					btnExecute.setEnabled(true);
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(
@@ -223,10 +230,8 @@ public class DensityMatrixSimulatorApp extends JFrame {
 			public void run() {
 				DijkstraResult result;
 				try {
-					path.clear();
-					
-					result = dijkstra.getShortestPath(matrixRender.getNodeEnd());
-					path.addAll(result.getPath());
+					result = dijkstra.getShortestPath(matrixSettings.getNodeEnd());
+					matrixSettings.updatePath(result.getPath());
 					matrix.repaint();
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(

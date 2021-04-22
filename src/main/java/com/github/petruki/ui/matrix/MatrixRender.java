@@ -2,25 +2,21 @@ package com.github.petruki.ui.matrix;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.util.List;
 
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
+import com.github.petruki.ui.model.MatrixSettings;
 import com.github.petruki.ui.model.Options;
 
 public class MatrixRender implements TableCellRenderer {
 
 	private Options selectedOption;
-	private final List<String> ignoredNodes;
-	private final List<String> path;
-	private String nodeStart;
-	private String nodeEnd;
+	private final MatrixSettings matrixSettings;
 
-	public MatrixRender(JTable table, List<String> ignoredNodes, List<String> path) {
-		this.path = path;
-		this.ignoredNodes = ignoredNodes;
+	public MatrixRender(JTable table, MatrixSettings matrixSettings) {
+		this.matrixSettings = matrixSettings;
 		setupTable(table);
 	}
 
@@ -36,16 +32,16 @@ public class MatrixRender implements TableCellRenderer {
 			updateSelectionRender(value.toString());
 		}
 		
-		if (ignoredNodes.contains(value.toString()))
+		if (matrixSettings.getIgnoredNodes().contains(value.toString()))
 			cell.setBackground(Color.BLACK);
 		
-		else if (path.contains(value.toString()))
+		else if (matrixSettings.getPath().contains(value.toString()))
 			cell.setBackground(Color.GREEN);
 		
-		else if (value.toString().equals(nodeStart)) {
+		else if (value.toString().equals(matrixSettings.getNodeStart())) {
 			cell.setBackground(Color.LIGHT_GRAY);
 			
-		} else if (value.toString().equals(nodeEnd))
+		} else if (value.toString().equals(matrixSettings.getNodeEnd()))
 			cell.setBackground(Color.GRAY);
 
 		return cell;
@@ -54,18 +50,14 @@ public class MatrixRender implements TableCellRenderer {
 	private void updateSelectionRender(String nodeId) {
 		switch (selectedOption) {
 		case SELECT_IGNORE:
-			if (ignoredNodes.contains(nodeId)) {
-				ignoredNodes.remove(nodeId);
-			} else {
-				ignoredNodes.add(nodeId);
-			}
+			matrixSettings.updateIgnoreNodes(nodeId);
 			break;
 		case SELECT_START:
-			nodeStart = nodeId;
+			matrixSettings.setNodeStart(nodeId);
 			selectedOption = Options.UNSELECTED;
 			break;
 		case SELECT_END:
-			nodeEnd = nodeId;
+			matrixSettings.setNodeEnd(nodeId);
 			selectedOption = Options.UNSELECTED;
 			break;
 		default:
@@ -83,22 +75,6 @@ public class MatrixRender implements TableCellRenderer {
 
 	public void setSelectedOption(Options selectedOption) {
 		this.selectedOption = selectedOption;
-	}
-
-	public String getNodeStart() {
-		return nodeStart;
-	}
-
-	public void setNodeStart(String nodeStart) {
-		this.nodeStart = nodeStart;
-	}
-
-	public String getNodeEnd() {
-		return nodeEnd;
-	}
-
-	public void setNodeEnd(String nodeEnd) {
-		this.nodeEnd = nodeEnd;
 	}
 
 }
