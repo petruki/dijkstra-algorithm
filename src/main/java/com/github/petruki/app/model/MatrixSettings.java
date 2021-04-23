@@ -13,10 +13,12 @@ public class MatrixSettings implements Serializable {
 	private String nodeStart;
 	private String nodeEnd;
 	private float diagonalTrip;
-	private int size;
+	private int sizeX;
+	private int sizeY;
 	
-	public MatrixSettings(int size, float diagonalTrip) {
-		this.size = size;
+	public MatrixSettings(int sizeX, int sizeY, float diagonalTrip) {
+		this.sizeX = sizeX;
+		this.sizeY = sizeY;
 		this.diagonalTrip = diagonalTrip;
 	}
 	
@@ -81,12 +83,20 @@ public class MatrixSettings implements Serializable {
 		this.diagonalTrip = diagonalTrip;
 	}
 
-	public int getSize() {
-		return size;
+	public int getSizeX() {
+		return sizeX;
 	}
 
-	public void setSize(int size) {
-		this.size = size;
+	public void setSizeX(int sizeX) {
+		this.sizeX = sizeX;
+	}
+
+	public int getSizeY() {
+		return sizeY;
+	}
+
+	public void setSizeY(int sizeY) {
+		this.sizeY = sizeY;
 	}
 
 }

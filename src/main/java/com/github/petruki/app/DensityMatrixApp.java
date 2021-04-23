@@ -50,7 +50,8 @@ public class DensityMatrixApp extends JFrame {
 
 	private JButton btnGenerate;
 	private JButton btnExecute;
-	private JSpinner matrixSize;
+	private JSpinner spinnerX;
+	private JSpinner spinnerY;
 	private JCheckBox chkDiagonalTrip;
 	private JProgressBar progressBar;
 	private JPanel contentPane;
@@ -68,7 +69,7 @@ public class DensityMatrixApp extends JFrame {
 		setTitle("Density Matrix Simulator - Dijkstra Pathfinder");
 		setIconImage(LoadImage.load("end.png"));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 678, 560);
+		setBounds(100, 100, 680, 570);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
@@ -118,9 +119,13 @@ public class DensityMatrixApp extends JFrame {
 		panel.add(txtTotalCost);
 		txtTotalCost.setColumns(10);
 		
-		matrixSize = new JSpinner();
-		matrixSize.setValue(30);
-		panel.add(matrixSize);
+		spinnerX = new JSpinner();
+		spinnerX.setValue(30);
+		panel.add(spinnerX);
+		
+		spinnerY = new JSpinner();
+		spinnerY.setValue(30);
+		panel.add(spinnerY);
 		
 		chkDiagonalTrip = new JCheckBox("Diagonal Trip");
 		chkDiagonalTrip.setSelected(true);
@@ -226,12 +231,14 @@ public class DensityMatrixApp extends JFrame {
 				// configure matrix
 				if (newWork) {
 					matrixSettings = new MatrixSettings(
-							Integer.valueOf(matrixSize.getValue().toString()),
+							Integer.valueOf(spinnerX.getValue().toString()),
+							Integer.valueOf(spinnerY.getValue().toString()),
 							chkDiagonalTrip.isSelected() ? 1.2f : -1);
 					
 					matrixSettings.resetMatrix();
 				} else {
-					matrixSize.setValue(matrixSettings.getSize());
+					spinnerX.setValue(matrixSettings.getSizeX());
+					spinnerY.setValue(matrixSettings.getSizeY());
 					chkDiagonalTrip.setSelected(matrixSettings.getDiagonalTrip() != -1);
 				}
 				
@@ -248,12 +255,13 @@ public class DensityMatrixApp extends JFrame {
 	
 	private String[][] createMatrixIds() {
 		matrixSettings.setDiagonalTrip(chkDiagonalTrip.isSelected() ? 1.2f : -1);
-		matrixSettings.setSize(Integer.valueOf(matrixSize.getValue().toString()));
+		matrixSettings.setSizeX(Integer.valueOf(spinnerX.getValue().toString()));
+		matrixSettings.setSizeY(Integer.valueOf(spinnerY.getValue().toString()));
 		
 		Integer nodeId = 0;
-		String[][] matrixIds = new String[matrixSettings.getSize()][matrixSettings.getSize()];
-		for (int i = 0; i < matrixIds.length; i++) {
-			for (int j = 0; j < matrixIds[i].length; j++) {
+		String[][] matrixIds = new String[matrixSettings.getSizeX()][matrixSettings.getSizeY()];
+		for (int i = 0; i < matrixSettings.getSizeX(); i++) {
+			for (int j = 0; j < matrixSettings.getSizeY(); j++) {
 				matrixIds[i][j] = String.valueOf(nodeId++);
 			}
 		}

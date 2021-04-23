@@ -9,7 +9,7 @@ public class MatrixModel {
 	@SuppressWarnings("serial")
 	public DefaultTableModel getTableModel(String[][] matrix) {
 		this.matrix = matrix;
-		return new DefaultTableModel(this.matrix, new String[this.matrix.length]) {
+		return new DefaultTableModel(this.matrix, new String[this.matrix[0].length]) {
 			@Override
 			public boolean isCellEditable(int row, int column) {
 				return false;

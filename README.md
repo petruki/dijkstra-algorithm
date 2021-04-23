@@ -79,7 +79,7 @@ vertex=J, prev= , distance=0
 
 ### Running: Density Matrix
 
-A density matrix consists of a given square matrix that contains 'n' nodes connected to all surrounding neighbors.
+A density matrix consists of a given matrix that contains 'n' nodes connected to all surrounding neighbors.
 The cost for both horizontal and vertical vertices can be different from diagonal vertices.
 
 To make the pathfinder more interesting, it is possible to exclude nodes from the matrix.
