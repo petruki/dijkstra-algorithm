@@ -77,7 +77,7 @@ vertex=H, prev=G, distance=5
 vertex=J, prev= , distance=0
 ```
 
-### Running: Density Matrix
+### Running: Generated Density Matrix
 
 A density matrix consists of a given matrix that contains 'n' nodes connected to all surrounding neighbors.
 The cost for both horizontal and vertical vertices can be different from diagonal vertices.
@@ -85,57 +85,123 @@ The cost for both horizontal and vertical vertices can be different from diagona
 To make the pathfinder more interesting, it is possible to exclude nodes from the matrix.
 
 ```java
-// Generates a 10x10 density matrix with 1 as h&v costs and 1.2 as diagonal cost
-Dijkstra dijkstra = new Dijkstra(DijkstraUtils.generateDensityMatrix(10, 1f, 1.2f));
+// Generates a 10x10 Density Matrix with 1un. as horizontal/vertical cost and ignored diagonal trip
+DensityMatrix densityMatrix = DijkstraUtils.generateDensityMatrix(10, 10, 1f, -1f);
+densityMatrix.setStartNode("0");
+densityMatrix.setEndNode("97");
+densityMatrix.setIgnored(Arrays.asList(
+		"96", "87", "88", "86", "77", "67", "69",
+		"57", "45", "35", "25", "14", "4", "44",
+		"54", "24", "53", "62", "52", "61", "71",
+		"40", "31", "30", "32", "22", "11"
+		));
 
-// Calculate the Dijkstra table starting at node 99 and
-// ignore the given list of nodes as the second argument
-dijkstra.generateTable("99", Arrays.asList(
-		"89", "88", "87", "86", "85", "84", "74", "65", "76", "56", "55", "67", "78"));
+// Build Dijkstra table
+Dijkstra dijkstra = new Dijkstra(densityMatrix.getVertices());
+dijkstra.generateTable(densityMatrix);
 
-// Find the shortest path in the matrix to node 79
-DijkstraResult result = dijkstra.getShortestPath("79");
+// Find shortest path
+DijkstraResult result = dijkstra.getShortestPath(densityMatrix.getEndNode());
 
-// Print result summary
+// Print results
 result.printResult(false);
-
-// Print result desity matrix
-DijkstraUtils.printResultDensityMatrix(result, 10, false);
+DijkstraUtils.printResultDensityMatrix(result, densityMatrix, true);
 ```
 
-#### **Output**
+##### **Output**
 
 - [NodeId] = shortest path found
 - X = ignored NodeIds 
 
 ```
-99 -> 79: [99, 98, 97, 96, 95, 94, 83, 73, 64, 75, 66, 57, 68, 79] - cost: 14.399999
-     0     1     2     3     4     5     6     7     8     9
-    10    11    12    13    14    15    16    17    18    19
-    20    21    22    23    24    25    26    27    28    29
-    30    31    32    33    34    35    36    37    38    39
-    40    41    42    43    44    45    46    47    48    49
-    50    51    52    53    54   [X]   [X]  [57]    58    59
-    60    61    62    63  [64]   [X]  [66]   [X]  [68]    69
-    70    71    72  [73]   [X]  [75]   [X]    77   [X]  [79]
-    80    81    82  [83]   [X]   [X]   [X]   [X]   [X]   [X]
-    90    91    92    93  [94]  [95]  [96]  [97]  [98]  [99]
+0 -> 97: [0, 1, 2, 12, 13, 23, 33, 43, 42, 41, 51, 50, 60, 70, 80, 81, 82, 72, 73, 63, 64, 65, 55, 56, 46, 47, 48, 58, 68, 78, 79, 89, 99, 98, 97] - cost: 34.0
+   [0]   [1]   [2]     3     +     5     6     7     8     9
+    10     +  [12]  [13]     +    15    16    17    18    19
+    20    21     +  [23]     +     +    26    27    28    29
+     +     +     +  [33]    34     +    36    37    38    39
+     +  [41]  [42]  [43]     +     +  [46]  [47]  [48]    49
+  [50]  [51]     +     +     +  [55]  [56]     +  [58]    59
+  [60]     +     +  [63]  [64]  [65]    66     +  [68]     +
+  [70]     +  [72]  [73]    74    75    76     +  [78]  [79]
+  [80]  [81]  [82]    83    84    85     +     +     +  [89]
+    90    91    92    93    94    95     +  [97]  [98]  [99]
 ```
 
-The last parameter of 'DijkstraUtils.printResultDensityMatrix' can print the matrix in a more visual way, which is interesting for maze simulations.
+The last parameter of 'DijkstraUtils.printResultDensityMatrix' can print the matrix in a prettier way, which is interesting for maze simulations.
 
 ```
-[O][O][O][-][X][-][-][-][-][-]
-[-][X][O][O][X][-][-][-][-][-]
-[-][-][X][O][X][X][-][-][-][-]
-[X][X][X][O][-][X][-][-][-][-]
-[X][O][O][O][X][X][O][O][O][-]
-[O][O][X][X][X][O][O][X][O][-]
-[O][X][X][O][O][O][-][X][O][X]
-[O][X][O][O][-][-][-][X][O][O]
-[O][O][O][-][-][-][X][X][X][O]
-[-][-][-][-][-][-][X][O][O][O]
+[O][O][O]     +               
+     +[O][O]  +               
+        +[O]  +  +            
+  +  +  +[O]     +            
+  +[O][O][O]  +  +[O][O][O]   
+[O][O]  +  +  +[O][O]  +[O]   
+[O]  +  +[O][O][O]     +[O]  +
+[O]  +[O][O]           +[O][O]
+[O][O][O]           +  +  +[O]
+                    +[O][O][O]
 ```
+
+### Running: Input Density Matrix
+
+It is also possible to give a plain text input that will be converted internally to the Density Matrix.
+
+The following example shows a maze type matrix, where the characters define its strucuture:
+
+- 'x': ignored/wall
+- ' ': travelable nodes
+- 's': starting node
+- 'e': ending node
+
+```java
+String[] maze = {
+	"+++++++++++++++",
+	"+s+       + +e+",
+	"+ +++++ +++ + +",
+	"+ + +       + +",
+	"+ +   +++ + + +",
+	"+ + + +   + + +",
+	"+   + +   + + +",
+	"+++++ +   + + +",
+	"+     +   +   +",
+	"+++++++++++++++"
+};
+```
+
+To code below shows how to use this strucuture as input for the Density Matrix.
+
+```java
+// Generates a Density Matrix based on a plain text input
+DensityMatrix densityMatrix = DijkstraUtils.generateDensityMatrix(maze, 1f, -1f);
+
+// Build Dijkstra table
+Dijkstra dijkstra = new Dijkstra(densityMatrix.getVertices());
+dijkstra.generateTable(densityMatrix);
+
+// Find shortest path
+DijkstraResult result = dijkstra.getShortestPath(densityMatrix.getEndNode());
+
+// Print results
+DijkstraUtils.printResultDensityMatrix(result, densityMatrix, true);
+
+```
+
+##### **Output**
+
+```
+  +  +  +  +  +  +  +  +  +  +  +  +  +  +  +
+  +[O]  +                       +     +[O]  +
+  +[O]  +  +  +  +  +     +  +  +     +[O]  +
+  +[O]  +     +[O][O][O][O][O][O][O]  +[O]  +
+  +[O]  +[O][O][O]  +  +  +     +[O]  +[O]  +
+  +[O]  +[O]  +     +           +[O]  +[O]  +
+  +[O][O][O]  +     +           +[O]  +[O]  +
+  +  +  +  +  +     +           +[O]  +[O]  +
+  +                 +           +[O][O][O]  +
+  +  +  +  +  +  +  +  +  +  +  +  +  +  +  +
+
+```
+
 
 #### **Density Matrix App**
 

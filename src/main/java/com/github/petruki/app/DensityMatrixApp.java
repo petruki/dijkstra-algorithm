@@ -5,18 +5,25 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
-import java.util.List;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
@@ -34,11 +41,8 @@ import com.github.petruki.app.model.MatrixVertex;
 import com.github.petruki.app.model.Options;
 import com.github.petruki.app.utils.FileManagement;
 import com.github.petruki.app.utils.LoadImage;
+import com.github.petruki.model.DensityMatrix;
 import com.github.petruki.model.DijkstraResult;
-import com.github.petruki.model.Vertex;
-
-import javax.swing.JTextField;
-import javax.swing.JProgressBar;
 
 /**
  * Simple app that displays the Density Matrix simulation using the Dijkstra algorithm
@@ -58,7 +62,7 @@ public class DensityMatrixApp extends JFrame {
 	private JTable matrix;
 	private MatrixRender matrixRender;
 	
-	private List<Vertex> densityMatrix;
+	private DensityMatrix densityMatrix;
 	private MatrixSettings matrixSettings;
 	
 	private Dijkstra dijkstra;
@@ -66,10 +70,12 @@ public class DensityMatrixApp extends JFrame {
 	private JTextField txtTotalCost;
 	
 	public DensityMatrixApp() {
-		setTitle("Density Matrix Simulator - Dijkstra Pathfinder");
+		setTitle("Density Matrix - Dijkstra Pathfinder");
 		setIconImage(LoadImage.load("end.png"));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 680, 570);
+		setBounds(100, 100, 680, 600);
+		
+		buildMenu();
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
@@ -78,27 +84,53 @@ public class DensityMatrixApp extends JFrame {
 		buildView();
 	}
 	
+	private void buildMenu() {
+		final JMenuBar menuBar = new JMenuBar();
+		setJMenuBar(menuBar);
+		
+		final JMenu mnNewMenu = new JMenu("Options");
+		menuBar.add(mnNewMenu);
+		
+		final JMenuItem menuNew = new JMenuItem("New");
+		menuNew.addActionListener(e -> initializeMatrix(true));
+		mnNewMenu.add(menuNew);
+		
+		final JMenuItem menuOpen = new JMenuItem("Open");
+		menuOpen.addActionListener(e -> {
+			matrixSettings = FileManagement.openReadWork();
+			if (matrixSettings != null) {
+				initializeMatrix(false);
+				onGenerate();
+			}
+		});
+		mnNewMenu.add(menuOpen);
+		
+		final JMenuItem menuSave = new JMenuItem("Save");
+		menuSave.addActionListener(e -> FileManagement.openSaveWork(matrixSettings));
+		mnNewMenu.add(menuSave);
+		
+		mnNewMenu.add(new JSeparator());
+		
+		final JMenuItem menuImport = new JMenuItem("Import");
+		mnNewMenu.add(menuImport);
+		menuImport.addActionListener(e -> {
+			DensityMatrixInputDialog importDialog = new DensityMatrixInputDialog();
+			importDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			importDialog.setVisible(true);
+			
+			importDialog.addWindowListener(new WindowAdapter() {
+			    @Override
+			    public void windowClosed(WindowEvent e) {
+			    	onImport(importDialog.getInput());
+		    	}
+			});
+		});
+	}
+	
 	private void buildView() {
 		// Build bottom bar
 		final JPanel panel = new JPanel();
 		contentPane.add(panel, BorderLayout.SOUTH);
-		
-		final JButton btnNew = new JButton("New");
-		btnNew.addActionListener(e -> initializeMatrix(true));
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.add(btnNew);
-		
-		final JButton btnOpen = new JButton("Open");
-		btnOpen.addActionListener(e -> {
-			matrixSettings = FileManagement.openReadWork();
-			if (matrixSettings != null)
-				initializeMatrix(false);
-		});
-		panel.add(btnOpen);
-		
-		final JButton btnSave = new JButton("Save");
-		btnSave.addActionListener(e -> FileManagement.openSaveWork(matrixSettings));
-		panel.add(btnSave);
 		
 		btnGenerate = new JButton("Generate");
 		btnGenerate.addActionListener(e -> onGenerate());
@@ -229,6 +261,8 @@ public class DensityMatrixApp extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				// configure matrix
+				densityMatrix = null;
+				
 				if (newWork) {
 					matrixSettings = new MatrixSettings(
 							Integer.valueOf(spinnerX.getValue().toString()),
@@ -254,10 +288,6 @@ public class DensityMatrixApp extends JFrame {
 	}
 	
 	private String[][] createMatrixIds() {
-		matrixSettings.setDiagonalTrip(chkDiagonalTrip.isSelected() ? 1.2f : -1);
-		matrixSettings.setSizeX(Integer.valueOf(spinnerX.getValue().toString()));
-		matrixSettings.setSizeY(Integer.valueOf(spinnerY.getValue().toString()));
-		
 		Integer nodeId = 0;
 		String[][] matrixIds = new String[matrixSettings.getSizeX()][matrixSettings.getSizeY()];
 		for (int i = 0; i < matrixSettings.getSizeX(); i++) {
@@ -269,6 +299,12 @@ public class DensityMatrixApp extends JFrame {
 		return matrixIds;
 	}
 	
+	private void updateMatrixSettings() {
+		matrixSettings.setDiagonalTrip(chkDiagonalTrip.isSelected() ? 1.2f : -1);
+		matrixSettings.setSizeX(Integer.valueOf(spinnerX.getValue().toString()));
+		matrixSettings.setSizeY(Integer.valueOf(spinnerY.getValue().toString()));
+	}
+	
 	private void onGenerate() {
 		progressBar.setVisible(true);
 		txtTotalCost.setVisible(false);
@@ -276,17 +312,25 @@ public class DensityMatrixApp extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					final String[][] matrixIds = createMatrixIds();
-					densityMatrix = DijkstraUtils.generateDensityMatrix(
-							matrixIds, 1f, matrixSettings.getDiagonalTrip());
+					updateMatrixSettings();
 					
-					dijkstra = new Dijkstra(densityMatrix);
+					if (densityMatrix == null) {
+						densityMatrix = DijkstraUtils.generateDensityMatrix(
+								createMatrixIds(), 1f, matrixSettings.getDiagonalTrip());
+					} else {
+						densityMatrix = DijkstraUtils.generateDensityMatrix(
+								densityMatrix.getMatrix(), 1f, matrixSettings.getDiagonalTrip());
+						
+						spinnerX.setValue(densityMatrix.getMatrix().length);
+						spinnerY.setValue(densityMatrix.getMaxSizeY());
+					}
+					
+					dijkstra = new Dijkstra(densityMatrix.getVertices());
 					dijkstra.generateTable(matrixSettings.getNodeStart(), matrixSettings.getIgnoredNodes());
 					
 					// reset view
 					btnGenerate.setEnabled(true);
 					btnExecute.setEnabled(true);
-					txtTotalCost.setText("");
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(
 							DensityMatrixApp.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -315,6 +359,27 @@ public class DensityMatrixApp extends JFrame {
 				}
 			}
 		});
+	}
+	
+	private void onImport(String input) {
+    	if (input == null || input.length() <= 0)
+    		return;
+    	
+		// compile text input
+		final String[] inpput = input.split("\n");
+		densityMatrix =
+				DijkstraUtils.generateDensityMatrix(inpput, 1f, matrixSettings.getDiagonalTrip());
+		
+		matrixSettings.resetMatrix();
+		matrixSettings.setNodeStart(densityMatrix.getStartNode());
+		matrixSettings.setNodeEnd(densityMatrix.getEndNode());
+		matrixSettings.setIgnoredNodes(densityMatrix.getIgnored());
+		
+		// initialize view
+		matrix.setModel(new MatrixModel().getTableModel(densityMatrix.getMatrix()));
+		matrixRender = new MatrixRender(matrix, matrixSettings);
+		
+		onGenerate();
 	}
 	
 	public static void main(String[] args) {

@@ -3,6 +3,7 @@ package com.github.petruki;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.petruki.model.DensityMatrix;
 import com.github.petruki.model.DijkstraResult;
 import com.github.petruki.model.DijkstraTable;
 import com.github.petruki.model.Vertex;
@@ -52,6 +53,16 @@ public class Dijkstra {
 		while((vertex = dTable.getVertexUnvisited()) != null) {
 			calculateShortestPath(vertex);
 		}
+	}
+	
+	/**
+	 * Generates table containing all shortest path for each node
+	 * 
+	 * @param densityMatrix which contains all matrix information
+	 * @throws Exception 
+	 */
+	public void generateTable(DensityMatrix densityMatrix) throws Exception {
+		this.generateTable(densityMatrix.getStartNode(), densityMatrix.getIgnored());
 	}
 	
 	/**
