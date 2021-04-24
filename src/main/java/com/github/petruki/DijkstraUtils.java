@@ -2,9 +2,17 @@ package com.github.petruki;
 
 import static com.github.petruki.model.Vertex.get;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import com.github.petruki.model.DensityMatrix;
 import com.github.petruki.model.DijkstraResult;
@@ -80,6 +88,50 @@ public class DijkstraUtils {
 		return densityMatrix;
 	}
 	
+	/**
+	 * Generates Density Matrix from image source
+	 * 
+	 * @param threshold White threshold (255 = max)
+	 */
+	public static DensityMatrix generateDensityMatrix(
+			File inputImage, int sizeX, int sizeY, int threshold,
+			float linearCost, float diagCost) 
+			throws Exception {
+		
+		BufferedImage image = ImageIO.read(inputImage);
+		if (image.getHeight() > 250 || image.getWidth() > 250)
+			throw new Exception("Resolution must be 250x250 or less");
+		
+		Image resultingImage = image.getScaledInstance(sizeX, sizeY, Image.SCALE_SMOOTH);
+
+		BufferedImage result = resizeImage(new BufferedImage(
+				image.getWidth(),
+				image.getHeight(),
+				BufferedImage.TYPE_INT_RGB), sizeX, sizeY);
+
+		Graphics2D graphic = result.createGraphics();
+		graphic.drawImage(resultingImage, 0, 0, Color.WHITE, null);
+
+		final String[] input = new String[sizeY];
+		for (int i = 0; i < result.getHeight(); i++) {
+			StringBuilder row = new StringBuilder();
+			for (int j = 0; j < result.getWidth(); j++) {					
+				Color color = new Color(result.getRGB(j, i));
+				if (color.getRed() > threshold && 
+					color.getGreen() > threshold && 
+					color.getBlue() > threshold) {
+					row.append(" ");			
+				} else {
+					row.append("+");
+				}
+			}
+			input[i] = row.toString();
+		}
+		
+		return generateDensityMatrix(input, linearCost, diagCost);
+	}
+
+	
 	public static DensityMatrix generateDensityMatrix(
 			String[][] matrix, float linearCost, float diagCost) {
 		
@@ -115,7 +167,6 @@ public class DijkstraUtils {
 		densityMatrix.setMaxSizeY(matrix[0].length);
 		return densityMatrix;
 	}
-
 	
 	public static void printResultDensityMatrix(
 			DijkstraResult result, DensityMatrix densityMatrix, boolean mask) {
@@ -137,6 +188,14 @@ public class DijkstraUtils {
 			Arrays.stream(row).forEach(col -> System.out.printf(mask ? "%3s" : "%6s", col));
 			System.out.println();
 		});
+	}
+	
+	private static BufferedImage resizeImage(
+			BufferedImage originalImage, int targetWidth, int targetHeight) throws IOException {
+	    Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT);
+	    BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+	    outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
+	    return outputImage;
 	}
 
 }

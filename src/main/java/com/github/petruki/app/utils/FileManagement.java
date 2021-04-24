@@ -14,7 +14,7 @@ import com.github.petruki.app.model.MatrixSettings;
 
 public class FileManagement {
 	
-	static FileFilter fileFilter = new FileFilter() {
+	static FileFilter matrixFileFilter = new FileFilter() {
 		@Override
 		public String getDescription() {
 			return "Density Matrix File (.dmf)";
@@ -28,6 +28,21 @@ public class FileManagement {
 		}
 	};
 	
+	static FileFilter imageFileFilter = new FileFilter() {
+		@Override
+		public String getDescription() {
+			return "Images only (png, jpg)";
+		}
+		
+		@Override
+		public boolean accept(File f) {
+			if (f.isDirectory())
+				return true;
+			return f.getName().toLowerCase().endsWith(".png") ||
+					f.getName().toLowerCase().endsWith(".jpg");
+		}
+	};
+	
 	public static MatrixSettings openReadWork() {
 		JFileChooser fileChooser = new JFileChooser();
 		
@@ -35,7 +50,7 @@ public class FileManagement {
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.setAcceptAllFileFilterUsed(false);
 		fileChooser.setCurrentDirectory(new File("./savedwork"));
-		fileChooser.setFileFilter(fileFilter);
+		fileChooser.setFileFilter(matrixFileFilter);
 		int result = fileChooser.showOpenDialog(fileChooser);
 		
 		if (result == JFileChooser.APPROVE_OPTION) {
@@ -64,7 +79,7 @@ public class FileManagement {
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.setAcceptAllFileFilterUsed(false);
 		fileChooser.setCurrentDirectory(new File("./savedwork"));
-		fileChooser.setFileFilter(fileFilter);
+		fileChooser.setFileFilter(matrixFileFilter);
 		int result = fileChooser.showSaveDialog(fileChooser);
 		
 		if (result == JFileChooser.APPROVE_OPTION) {
@@ -80,6 +95,23 @@ public class FileManagement {
 			JOptionPane.showMessageDialog(
 					null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
+	}
+	
+	public static File openImage() {
+		JFileChooser fileChooser = new JFileChooser();
+		
+		fileChooser.setDialogTitle("Open image");
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		fileChooser.setCurrentDirectory(new File("./sample"));
+		fileChooser.setAcceptAllFileFilterUsed(false);
+		fileChooser.setFileFilter(imageFileFilter);
+		int result = fileChooser.showOpenDialog(fileChooser);
+		
+		if (result == JFileChooser.APPROVE_OPTION) {
+			return fileChooser.getSelectedFile();
+		}
+		
+		return null;
 	}
 
 }

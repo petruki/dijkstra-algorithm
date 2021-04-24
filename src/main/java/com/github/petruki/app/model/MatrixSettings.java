@@ -25,6 +25,8 @@ public class MatrixSettings implements Serializable {
 	public void resetMatrix() {
 		this.ignoredNodes.clear();
 		this.path.clear();
+		this.nodeStart = null;
+		this.nodeEnd = null;
 	}
 	
 	public void updatePath(List<String> path) {

@@ -7,6 +7,7 @@ import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -111,8 +112,9 @@ public class DensityMatrixApp extends JFrame {
 		
 		mnNewMenu.add(new JSeparator());
 		
-		final JMenuItem menuImport = new JMenuItem("Import");
+		final JMenuItem menuImport = new JMenuItem("Import Text");
 		mnNewMenu.add(menuImport);
+		
 		menuImport.addActionListener(e -> {
 			DensityMatrixInputDialog importDialog = new DensityMatrixInputDialog();
 			importDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -125,6 +127,12 @@ public class DensityMatrixApp extends JFrame {
 		    	}
 			});
 		});
+		
+		final JMenuItem menuImportImage = new JMenuItem("Import Image");
+		menuImportImage.addActionListener(e -> {
+			onImportImage(FileManagement.openImage());
+		});
+		mnNewMenu.add(menuImportImage);
 	}
 	
 	private void buildView() {
@@ -380,6 +388,35 @@ public class DensityMatrixApp extends JFrame {
 		matrixRender = new MatrixRender(matrix, matrixSettings);
 		
 		onGenerate();
+	}
+	
+	private void onImportImage(File input) {
+    	if (input == null)
+    		return;
+    	
+    	try {
+    		String thresholdLevel = JOptionPane.showInputDialog("Detail level (0-255)", "190");
+    		if (thresholdLevel == null || thresholdLevel.length() == 0)
+    			thresholdLevel = "190";
+    		
+    		// generate density matrix from image
+			densityMatrix = DijkstraUtils.generateDensityMatrix(
+					input, 
+					Integer.valueOf(spinnerX.getValue().toString()), 
+					Integer.valueOf(spinnerY.getValue().toString()), 
+					Integer.valueOf(thresholdLevel), 1f, matrixSettings.getDiagonalTrip());
+			
+			matrixSettings.resetMatrix();
+			matrixSettings.setIgnoredNodes(densityMatrix.getIgnored());
+			
+			// initialize view
+			matrix.setModel(new MatrixModel().getTableModel(densityMatrix.getMatrix()));
+			matrixRender = new MatrixRender(matrix, matrixSettings);
+			matrix.repaint();
+    	} catch (Exception e) {
+    		JOptionPane.showMessageDialog(
+					DensityMatrixApp.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 	
 	public static void main(String[] args) {

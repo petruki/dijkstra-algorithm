@@ -14,6 +14,7 @@ I have added a few features that can make more complex scenarios such as unidire
 - Vertices can be set as single or bidirectional for more complex scenarios.
 - Nodes can bet set to ignored.
 - Density matrix for pathfinder simulations.
+	- Import plaintext or images
 - Display result table.
 - Display summary with visited nodes and total cost.
 
@@ -208,3 +209,15 @@ DijkstraUtils.printResultDensityMatrix(result, densityMatrix, true);
 Create simulations based on Density Matrix scenarios or open the sampe included in this project located at: savedwork/demo1.dmf
 
 ![Density Matrix Sample](https://raw.githubusercontent.com/petruki/dijkstra-algorithm/master/docs/density_matrix_app.jpg)
+
+#### **Density Matrix App: Importing images**
+
+Try using this simple built-in image processor that can import data from external image sources.
+
+> Image Sample
+
+![Image Sample](https://raw.githubusercontent.com/petruki/dijkstra-algorithm/master/sample/maze.png)
+
+> Output
+
+![Density Matrix Sample](https://raw.githubusercontent.com/petruki/dijkstra-algorithm/master/docs/density_matrix_app_image_import.jpg)
