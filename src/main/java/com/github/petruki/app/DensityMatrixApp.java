@@ -4,15 +4,16 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.HeadlessException;
 import java.awt.Toolkit;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -112,20 +113,17 @@ public class DensityMatrixApp extends JFrame {
 		
 		mnNewMenu.add(new JSeparator());
 		
-		final JMenuItem menuImport = new JMenuItem("Import Text");
+		final JMenuItem menuImport = new JMenuItem("Import Clipboard");
 		mnNewMenu.add(menuImport);
 		
 		menuImport.addActionListener(e -> {
-			DensityMatrixInputDialog importDialog = new DensityMatrixInputDialog();
-			importDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			importDialog.setVisible(true);
-			
-			importDialog.addWindowListener(new WindowAdapter() {
-			    @Override
-			    public void windowClosed(WindowEvent e) {
-			    	onImport(importDialog.getInput());
-		    	}
-			});
+			try {	
+				onImport((String) Toolkit.getDefaultToolkit()
+				        .getSystemClipboard().getData(DataFlavor.stringFlavor));
+			} catch (HeadlessException | UnsupportedFlavorException | IOException ex) {
+				JOptionPane.showMessageDialog(
+						DensityMatrixApp.this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			}
 		});
 		
 		final JMenuItem menuImportImage = new JMenuItem("Import Image");
