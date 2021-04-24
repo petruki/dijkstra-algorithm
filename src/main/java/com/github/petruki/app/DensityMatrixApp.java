@@ -94,14 +94,20 @@ public class DensityMatrixApp extends JFrame {
 		menuBar.add(mnNewMenu);
 		
 		final JMenuItem menuNew = new JMenuItem("New");
-		menuNew.addActionListener(e -> initializeMatrix(true));
+		menuNew.addActionListener(e -> initializeMatrix(true, false));
 		mnNewMenu.add(menuNew);
+		
+		final JMenuItem menuNewInverted = new JMenuItem("New Inverted");
+		menuNewInverted.addActionListener(e -> initializeMatrix(true, true));
+		mnNewMenu.add(menuNewInverted);
+		
+		mnNewMenu.add(new JSeparator());
 		
 		final JMenuItem menuOpen = new JMenuItem("Open");
 		menuOpen.addActionListener(e -> {
 			matrixSettings = FileManagement.openReadWork();
 			if (matrixSettings != null) {
-				initializeMatrix(false);
+				initializeMatrix(false, false);
 				onGenerate();
 			}
 		});
@@ -113,12 +119,12 @@ public class DensityMatrixApp extends JFrame {
 		
 		mnNewMenu.add(new JSeparator());
 		
-		final JMenuItem menuImport = new JMenuItem("Import Clipboard");
-		mnNewMenu.add(menuImport);
+		final JMenuItem menuImportClipboard = new JMenuItem("Import Clipboard");
+		mnNewMenu.add(menuImportClipboard);
 		
-		menuImport.addActionListener(e -> {
+		menuImportClipboard.addActionListener(e -> {
 			try {	
-				onImport((String) Toolkit.getDefaultToolkit()
+				onImportClipboard((String) Toolkit.getDefaultToolkit()
 				        .getSystemClipboard().getData(DataFlavor.stringFlavor));
 			} catch (HeadlessException | UnsupportedFlavorException | IOException ex) {
 				JOptionPane.showMessageDialog(
@@ -226,7 +232,7 @@ public class DensityMatrixApp extends JFrame {
 		contentPane.add(new JScrollPane(matrix), BorderLayout.CENTER);
 		
 		centerUI();
-		initializeMatrix(true);
+		initializeMatrix(true, false);
 		initMatrixEventHandler();
 	}
 	
@@ -263,7 +269,7 @@ public class DensityMatrixApp extends JFrame {
 		setLocation(x, y);
 	}
 	
-	private void initializeMatrix(boolean newWork) {
+	private void initializeMatrix(boolean newWork, boolean inverted) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				// configure matrix
@@ -283,7 +289,7 @@ public class DensityMatrixApp extends JFrame {
 				}
 				
 				// initialize view
-				matrix.setModel(new MatrixModel().getTableModel(createMatrixIds()));
+				matrix.setModel(new MatrixModel().getTableModel(createMatrixIds(inverted)));
 				matrixRender = new MatrixRender(matrix, matrixSettings);
 				
 				// reset view
@@ -293,12 +299,14 @@ public class DensityMatrixApp extends JFrame {
 		});
 	}
 	
-	private String[][] createMatrixIds() {
+	private String[][] createMatrixIds(boolean inverted) {
 		Integer nodeId = 0;
 		String[][] matrixIds = new String[matrixSettings.getSizeX()][matrixSettings.getSizeY()];
 		for (int i = 0; i < matrixSettings.getSizeX(); i++) {
-			for (int j = 0; j < matrixSettings.getSizeY(); j++) {
-				matrixIds[i][j] = String.valueOf(nodeId++);
+			for (int j = 0; j < matrixSettings.getSizeY(); j++, nodeId++) {
+				if (inverted)
+					matrixSettings.getIgnoredNodes().add(String.valueOf(nodeId));
+				matrixIds[i][j] = String.valueOf(nodeId);
 			}
 		}
 		
@@ -322,7 +330,7 @@ public class DensityMatrixApp extends JFrame {
 					
 					if (densityMatrix == null) {
 						densityMatrix = DijkstraUtils.generateDensityMatrix(
-								createMatrixIds(), 1f, matrixSettings.getDiagonalTrip());
+								createMatrixIds(false), 1f, matrixSettings.getDiagonalTrip());
 					} else {
 						densityMatrix = DijkstraUtils.generateDensityMatrix(
 								densityMatrix.getMatrix(), 1f, matrixSettings.getDiagonalTrip());
@@ -367,7 +375,7 @@ public class DensityMatrixApp extends JFrame {
 		});
 	}
 	
-	private void onImport(String input) {
+	private void onImportClipboard(String input) {
     	if (input == null || input.length() <= 0)
     		return;
     	
@@ -384,8 +392,6 @@ public class DensityMatrixApp extends JFrame {
 		// initialize view
 		matrix.setModel(new MatrixModel().getTableModel(densityMatrix.getMatrix()));
 		matrixRender = new MatrixRender(matrix, matrixSettings);
-		
-		onGenerate();
 	}
 	
 	private void onImportImage(File input) {
