@@ -56,8 +56,8 @@ public class DensityMatrixApp extends JFrame {
 
 	private JButton btnGenerate;
 	private JButton btnExecute;
-	private JSpinner spinnerX;
-	private JSpinner spinnerY;
+	private JSpinner spinnerRows;
+	private JSpinner spinnerCols;
 	private JCheckBox chkDiagonalTrip;
 	private JProgressBar progressBar;
 	private JPanel contentPane;
@@ -133,9 +133,7 @@ public class DensityMatrixApp extends JFrame {
 		});
 		
 		final JMenuItem menuImportImage = new JMenuItem("Import Image");
-		menuImportImage.addActionListener(e -> {
-			onImportImage(FileManagement.openImage());
-		});
+		menuImportImage.addActionListener(e -> onImportImage(FileManagement.openImage()));
 		mnNewMenu.add(menuImportImage);
 	}
 	
@@ -163,13 +161,15 @@ public class DensityMatrixApp extends JFrame {
 		panel.add(txtTotalCost);
 		txtTotalCost.setColumns(10);
 		
-		spinnerX = new JSpinner();
-		spinnerX.setValue(30);
-		panel.add(spinnerX);
+		spinnerRows = new JSpinner();
+		spinnerRows.setValue(30);
+		spinnerRows.setToolTipText("Rows");
+		panel.add(spinnerRows);
 		
-		spinnerY = new JSpinner();
-		spinnerY.setValue(30);
-		panel.add(spinnerY);
+		spinnerCols = new JSpinner();
+		spinnerCols.setValue(30);
+		spinnerCols.setToolTipText("Cols");
+		panel.add(spinnerCols);
 		
 		chkDiagonalTrip = new JCheckBox("Diagonal Trip");
 		chkDiagonalTrip.setSelected(true);
@@ -277,14 +277,14 @@ public class DensityMatrixApp extends JFrame {
 				
 				if (newWork) {
 					matrixSettings = new MatrixSettings(
-							Integer.valueOf(spinnerX.getValue().toString()),
-							Integer.valueOf(spinnerY.getValue().toString()),
+							Integer.valueOf(spinnerRows.getValue().toString()),
+							Integer.valueOf(spinnerCols.getValue().toString()),
 							chkDiagonalTrip.isSelected() ? 1.2f : -1);
 					
 					matrixSettings.resetMatrix();
 				} else {
-					spinnerX.setValue(matrixSettings.getSizeX());
-					spinnerY.setValue(matrixSettings.getSizeY());
+					spinnerRows.setValue(matrixSettings.getSizeX());
+					spinnerCols.setValue(matrixSettings.getSizeY());
 					chkDiagonalTrip.setSelected(matrixSettings.getDiagonalTrip() != -1);
 				}
 				
@@ -315,8 +315,8 @@ public class DensityMatrixApp extends JFrame {
 	
 	private void updateMatrixSettings() {
 		matrixSettings.setDiagonalTrip(chkDiagonalTrip.isSelected() ? 1.2f : -1);
-		matrixSettings.setSizeX(Integer.valueOf(spinnerX.getValue().toString()));
-		matrixSettings.setSizeY(Integer.valueOf(spinnerY.getValue().toString()));
+		matrixSettings.setSizeX(Integer.valueOf(spinnerRows.getValue().toString()));
+		matrixSettings.setSizeY(Integer.valueOf(spinnerCols.getValue().toString()));
 	}
 	
 	private void onGenerate() {
@@ -335,8 +335,8 @@ public class DensityMatrixApp extends JFrame {
 						densityMatrix = DijkstraUtils.generateDensityMatrix(
 								densityMatrix.getMatrix(), 1f, matrixSettings.getDiagonalTrip());
 						
-						spinnerX.setValue(densityMatrix.getMatrix().length);
-						spinnerY.setValue(densityMatrix.getMaxSizeY());
+						spinnerRows.setValue(densityMatrix.getMatrix().length);
+						spinnerCols.setValue(densityMatrix.getMaxSizeY());
 					}
 					
 					dijkstra = new Dijkstra(densityMatrix.getVertices());
@@ -406,8 +406,8 @@ public class DensityMatrixApp extends JFrame {
     		// generate density matrix from image
 			densityMatrix = DijkstraUtils.generateDensityMatrix(
 					input, 
-					Integer.valueOf(spinnerX.getValue().toString()), 
-					Integer.valueOf(spinnerY.getValue().toString()), 
+					Integer.valueOf(spinnerCols.getValue().toString()), 
+					Integer.valueOf(spinnerRows.getValue().toString()), 
 					Integer.valueOf(thresholdLevel), 1f, matrixSettings.getDiagonalTrip());
 			
 			matrixSettings.resetMatrix();

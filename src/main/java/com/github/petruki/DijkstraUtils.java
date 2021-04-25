@@ -3,7 +3,6 @@ package com.github.petruki;
 import static com.github.petruki.model.Vertex.get;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -18,6 +17,11 @@ import com.github.petruki.model.DensityMatrix;
 import com.github.petruki.model.DijkstraResult;
 
 public class DijkstraUtils {
+	
+	private static final String A = " ";
+	private static final String X = "+";
+	private static final String S = "s";
+	private static final String E = "e";
 	
 	/**
 	 * Generates a Density Matrix baxed on sizeX (rows) and sizeY (columns).
@@ -70,11 +74,11 @@ public class DijkstraUtils {
 			for (int j = 0; j < input[i].length(); j++, nodeId++) {
 				matrix[i][j] = nodeId.toString();
 				
-				if (input[i].charAt(j) == '+')
+				if (input[i].charAt(j) == X.charAt(0))
 					ignore.add(nodeId.toString());
-				else if (input[i].charAt(j) == 's')
+				else if (input[i].charAt(j) == S.charAt(0))
 					startNode = nodeId.toString();
-				else if (input[i].charAt(j) == 'e') {
+				else if (input[i].charAt(j) == E.charAt(0)) {
 					endNode = nodeId.toString();
 				}
 			}
@@ -94,38 +98,32 @@ public class DijkstraUtils {
 	 * @param threshold White threshold (255 = max)
 	 */
 	public static DensityMatrix generateDensityMatrix(
-			File inputImage, int sizeX, int sizeY, int threshold,
+			File inputImage, int width, int height, int threshold,
 			float linearCost, float diagCost) 
 			throws Exception {
 		
-		BufferedImage image = ImageIO.read(inputImage);
-		if (image.getHeight() > 250 || image.getWidth() > 250)
-			throw new Exception("Resolution must be 250x250 or less");
+		BufferedImage originalImage = ImageIO.read(inputImage);
+		BufferedImage resizedimage = resizeImage(originalImage, width, height);
+
+		Color color;
+		final StringBuilder row = new StringBuilder();
+		final String[] input = new String[height];
 		
-		Image resultingImage = image.getScaledInstance(sizeX, sizeY, Image.SCALE_SMOOTH);
-
-		BufferedImage result = resizeImage(new BufferedImage(
-				image.getWidth(),
-				image.getHeight(),
-				BufferedImage.TYPE_INT_RGB), sizeX, sizeY);
-
-		Graphics2D graphic = result.createGraphics();
-		graphic.drawImage(resultingImage, 0, 0, Color.WHITE, null);
-
-		final String[] input = new String[sizeY];
-		for (int i = 0; i < result.getHeight(); i++) {
-			StringBuilder row = new StringBuilder();
-			for (int j = 0; j < result.getWidth(); j++) {					
-				Color color = new Color(result.getRGB(j, i));
+		for (int h = 0; h < resizedimage.getHeight(); h++) {
+			
+			row.setLength(0);
+			for (int w = 0; w < resizedimage.getWidth(); w++) {					
+				color = new Color(resizedimage.getRGB(w, h));
 				if (color.getRed() > threshold && 
 					color.getGreen() > threshold && 
 					color.getBlue() > threshold) {
-					row.append(" ");			
+					row.append(A);			
 				} else {
-					row.append("+");
+					row.append(X);
 				}
 			}
-			input[i] = row.toString();
+			
+			input[h] = row.toString();
 		}
 		
 		return generateDensityMatrix(input, linearCost, diagCost);
@@ -176,7 +174,7 @@ public class DijkstraUtils {
 		for (int row = 0; row < matrix.length; row++) {
 			for (int col = 0; col < matrix[row].length; col++, nodeId++) {
 				if (result.getDTable().getIgnored().contains(nodeId.toString())) {
-					matrix[row][col] = "+";
+					matrix[row][col] = X;
 				} else {
 					matrix[row][col] = result.getPath().contains(nodeId.toString()) ? 
 							String.format("[%s]", mask ? "O" : nodeId) : mask ? "   " : nodeId.toString();					
@@ -192,7 +190,7 @@ public class DijkstraUtils {
 	
 	private static BufferedImage resizeImage(
 			BufferedImage originalImage, int targetWidth, int targetHeight) throws IOException {
-	    Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT);
+	    Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
 	    BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
 	    outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
 	    return outputImage;
