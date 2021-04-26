@@ -5,6 +5,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.HeadlessException;
+import java.awt.MouseInfo;
+import java.awt.Rectangle;
+import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -71,6 +74,8 @@ public class DensityMatrixApp extends JFrame {
 	private Options optionSelected = Options.UNSELECTED;
 	private JTextField txtTotalCost;
 	
+	private boolean capturing = true;
+	
 	public DensityMatrixApp() {
 		setTitle("Density Matrix - Dijkstra Pathfinder");
 		setIconImage(LoadImage.load("end.png"));
@@ -135,6 +140,12 @@ public class DensityMatrixApp extends JFrame {
 		final JMenuItem menuImportImage = new JMenuItem("Import Image");
 		menuImportImage.addActionListener(e -> onImportImage(FileManagement.openImage()));
 		mnNewMenu.add(menuImportImage);
+		
+		mnNewMenu.add(new JSeparator());
+		
+		final JMenuItem menuImportImageBuffer = new JMenuItem("Start Capturing");
+		menuImportImageBuffer.addActionListener(e -> onImportImageBuffer());
+		mnNewMenu.add(menuImportImageBuffer);
 	}
 	
 	private void buildView() {
@@ -320,6 +331,12 @@ public class DensityMatrixApp extends JFrame {
 	}
 	
 	private void onGenerate() {
+		if (capturing) {
+			btnGenerate.setText("Generate");
+			capturing = false;
+			return;
+		}
+		
 		progressBar.setVisible(true);
 		txtTotalCost.setVisible(false);
 		
@@ -417,6 +434,58 @@ public class DensityMatrixApp extends JFrame {
 			matrix.setModel(new MatrixModel().getTableModel(densityMatrix.getMatrix()));
 			matrixRender = new MatrixRender(matrix, matrixSettings);
 			matrix.repaint();
+    	} catch (Exception e) {
+    		JOptionPane.showMessageDialog(
+					DensityMatrixApp.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	private void onImportImageBuffer() {
+		JOptionPane.showConfirmDialog(this, 
+				"Place your mouse cursor at the start and press ok.", "Find Start", 
+				JOptionPane.OK_CANCEL_OPTION);
+		final int xStartPos = MouseInfo.getPointerInfo().getLocation().x;
+		final int yStartPos = MouseInfo.getPointerInfo().getLocation().y;
+	    
+	    JOptionPane.showConfirmDialog(this, 
+				"Place your mouse cursor at the end and press ok.", "Find End", 
+				JOptionPane.OK_CANCEL_OPTION);
+	    final int xEndPos = MouseInfo.getPointerInfo().getLocation().x;
+	    final int yEndPos = MouseInfo.getPointerInfo().getLocation().y;
+	    
+	    int thresholdLevel = Integer.parseInt(JOptionPane.showInputDialog("Detail level (0-255)", 190));
+		
+    	try {
+    		Robot robot = new Robot();
+    	    int width = (xEndPos - xStartPos), height = (yEndPos - yStartPos);
+    	    Rectangle area = new Rectangle(xStartPos, yStartPos, width, height);
+    	    
+    	    final int sampleCols = Integer.valueOf(spinnerCols.getValue().toString());
+    	    final int sampleRows = Integer.valueOf(spinnerRows.getValue().toString());
+ 
+    	    new Thread() {
+    	    	public void run() {
+    	    	    capturing = true;
+    	    	    btnGenerate.setText("Stop Capture");
+    	    	    
+    	    		final MatrixRender matrixRender = new MatrixRender(matrix, matrixSettings);
+    	    		
+    	    	    while (capturing) {
+    	    	    	try {
+							densityMatrix = DijkstraUtils.generateDensityMatrix(
+									robot.createScreenCapture(area), 
+									sampleCols, 
+									sampleRows, thresholdLevel, 1f, -1f);
+	    	    	    	
+	    	    	    	matrixSettings.setIgnoredNodes(densityMatrix.getIgnored());
+	    	    	    	matrixRender.setMatrixSettings(matrixSettings);
+	    	    	    	matrix.repaint();
+	    	    	    	Thread.sleep(20);
+    	    	    	} catch (Exception e) {}
+    	    	    }
+    	    	}
+    	    }.start();
+
     	} catch (Exception e) {
     		JOptionPane.showMessageDialog(
 					DensityMatrixApp.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

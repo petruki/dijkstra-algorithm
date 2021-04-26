@@ -13,10 +13,14 @@ import com.github.petruki.app.model.Options;
 public class MatrixRender implements TableCellRenderer {
 
 	private Options selectedOption;
-	private final MatrixSettings matrixSettings;
+	private MatrixSettings matrixSettings;
 
 	public MatrixRender(JTable table, MatrixSettings matrixSettings) {
 		this.matrixSettings = matrixSettings;
+		setupTable(table);
+	}
+	
+	public MatrixRender(JTable table) {
 		setupTable(table);
 	}
 
@@ -71,6 +75,10 @@ public class MatrixRender implements TableCellRenderer {
 			columnName = table.getColumnName(i);
 			table.getColumn(columnName).setCellRenderer(this);
 		}
+	}
+
+	public void setMatrixSettings(MatrixSettings matrixSettings) {
+		this.matrixSettings = matrixSettings;
 	}
 
 	public void setSelectedOption(Options selectedOption) {

@@ -93,9 +93,7 @@ public class DijkstraUtils {
 	}
 	
 	/**
-	 * Generates Density Matrix from image source
-	 * 
-	 * @param threshold White threshold (255 = max)
+	 * Generates Density Matrix from image file source
 	 */
 	public static DensityMatrix generateDensityMatrix(
 			File inputImage, int width, int height, int threshold,
@@ -103,7 +101,18 @@ public class DijkstraUtils {
 			throws Exception {
 		
 		BufferedImage originalImage = ImageIO.read(inputImage);
-		BufferedImage resizedimage = resizeImage(originalImage, width, height);
+		return generateDensityMatrix(originalImage, width, height, threshold, linearCost, diagCost);
+	}
+	
+	/**
+	 * Generates Density Matrix from image buffer source
+	 */
+	public static DensityMatrix generateDensityMatrix(
+			BufferedImage imageBuffer, int width, int height, int threshold,
+			float linearCost, float diagCost) 
+			throws Exception {
+		
+		BufferedImage resizedimage = resizeImage(imageBuffer, width, height);
 
 		Color color;
 		final StringBuilder row = new StringBuilder();
@@ -114,9 +123,7 @@ public class DijkstraUtils {
 			row.setLength(0);
 			for (int w = 0; w < resizedimage.getWidth(); w++) {					
 				color = new Color(resizedimage.getRGB(w, h));
-				if (color.getRed() > threshold && 
-					color.getGreen() > threshold && 
-					color.getBlue() > threshold) {
+				if (color.getRed() > threshold) {
 					row.append(A);			
 				} else {
 					row.append(X);
