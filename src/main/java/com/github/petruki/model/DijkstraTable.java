@@ -13,27 +13,27 @@ public class DijkstraTable {
 	
 	private Map<String, List<Vertex>> paths;
 	private Set<Vertex> verticesTable;
+	private Set<String> visited;
+	private Set<String> ignored;
 	private Vertex[] sortedTable;
-	private List<String> visited;
-	private List<String> ignored;
 	private final String nodeOrigin;
 	
-	public DijkstraTable(List<Vertex> input, List<String> ignored, 
+	public DijkstraTable(Set<Vertex> input, Set<String> ignored, 
 			String nodeOrigin) throws Exception {
 		this.nodeOrigin = nodeOrigin;
-		this.ignored = ignored == null ? new ArrayList<>() : ignored;
+		this.ignored = ignored == null ? new HashSet<>() : ignored;
 		
 		initTable(input, ignored);
 		setNodeOrigin(nodeOrigin);
 	}
 	
-	private void initTable(List<Vertex> input, List<String> ignored) {
+	private void initTable(Set<Vertex> input, Set<String> ignored) {
 		paths = new HashMap<>();
 		verticesTable = new HashSet<>();
-		visited = new ArrayList<>();
+		visited = new HashSet<>();
 		
 		if (ignored == null)
-			ignored = new ArrayList<String>();
+			ignored = new HashSet<String>();
 		
 		for (Vertex v : input) {
 			if (ignored.contains(v.getNode1()) || ignored.contains(v.getNode2()))
@@ -117,7 +117,7 @@ public class DijkstraTable {
 		return paths.get(node);
 	}
 
-	public List<String> getIgnored() {
+	public Set<String> getIgnored() {
 		return ignored;
 	}
 

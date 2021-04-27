@@ -1,7 +1,9 @@
 package com.github.petruki;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.github.petruki.model.DensityMatrix;
 import com.github.petruki.model.DijkstraResult;
@@ -22,11 +24,16 @@ import com.github.petruki.model.Vertex;
  */
 public class Dijkstra {
 	
-	private List<Vertex> vertices;
+	private Set<Vertex> vertices;
 	private DijkstraTable dTable;
 	
-	public Dijkstra(List<Vertex> vertices) {
+	public Dijkstra(Set<Vertex> vertices) {
 		this.vertices = vertices;
+	}
+	
+	public Dijkstra(List<Vertex> vertices) {
+		this.vertices = new HashSet<>();
+		this.vertices.addAll(vertices);
 	}
 	
 	/**
@@ -46,7 +53,7 @@ public class Dijkstra {
 	 * @param ignored nodes
 	 * @throws Exception 
 	 */
-	public void generateTable(String nodeOrigin, List<String> ignored) throws Exception {
+	public void generateTable(String nodeOrigin, Set<String> ignored) throws Exception {
 		dTable = new DijkstraTable(vertices, ignored, nodeOrigin);
 		
 		Vertex vertex;
@@ -72,7 +79,7 @@ public class Dijkstra {
 	 * @throws Exception 
 	 */
 	public DijkstraResult getShortestPath(String nodeDestination) throws Exception {
-		List<String> path = buildPathNodeList(dTable.getNodeOrigin(), nodeDestination);
+		Set<String> path = buildPathNodeList(dTable.getNodeOrigin(), nodeDestination);
 		return new DijkstraResult(path, dTable, nodeDestination);
 	}
 
@@ -95,23 +102,24 @@ public class Dijkstra {
 		return distance;
 	}
 	
-	private List<String> buildPathNodeList(String nodeOrigin, String nodeDest) 
+	private Set<String> buildPathNodeList(String nodeOrigin, String nodeDest) 
 			throws Exception {
 		
-		Vertex dsstVertex = dTable.getVertices().stream()
+		final Vertex dstVertex = dTable.getVertices().stream()
 				.filter(v -> v.getNode1().equals(nodeDest))
 				.findFirst().orElseThrow(() -> new Exception("Destination node not found"));
 		
-		if (nodeOrigin.equals(dsstVertex.getNode2())) {
-			List<String> path = new ArrayList<>();
-			path.add(dsstVertex.getNode2());
+		if (nodeOrigin.equals(dstVertex.getNode2())) {
+			final Set<String> path = new LinkedHashSet<>();
+			path.add(dstVertex.getNode2());
 			return path;
 		}
 		
-		List<String> path = buildPathNodeList(nodeOrigin, dsstVertex.getNode2());
-		if (!path.contains(dsstVertex.getNode2()))
-			path.add(dsstVertex.getNode2());
-		path.add(dsstVertex.getNode1());
+		final Set<String> path = buildPathNodeList(nodeOrigin, dstVertex.getNode2());
+		if (!path.contains(dstVertex.getNode2()))
+			path.add(dstVertex.getNode2());
+		
+		path.add(dstVertex.getNode1());
 		return path;
 	}
 	

@@ -1,12 +1,13 @@
 package com.github.petruki.model;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class DensityMatrix {
 	
-	private List<Vertex> vertices = new ArrayList<>();
-	private List<String> ignored = new ArrayList<>();
+	private Set<Vertex> vertices = new HashSet<>();
+	private Set<String> ignored = new HashSet<>();
 	private String[][] matrix;
 	private String startNode;
 	private String endNode;
@@ -20,11 +21,11 @@ public class DensityMatrix {
 		ignored.add(nodeId);
 	}
 	
-	public List<Vertex> getVertices() {
+	public Set<Vertex> getVertices() {
 		return vertices;
 	}
 	
-	public void setVertices(List<Vertex> matrix) {
+	public void setVertices(Set<Vertex> matrix) {
 		this.vertices = matrix;
 	}
 	
@@ -36,12 +37,17 @@ public class DensityMatrix {
 		this.matrix = matrix;
 	}
 
-	public List<String> getIgnored() {
+	public Set<String> getIgnored() {
 		return ignored;
 	}
 	
-	public void setIgnored(List<String> ignored) {
+	public void setIgnored(Set<String> ignored) {
 		this.ignored = ignored;
+	}
+	
+	public void setIgnored(List<String> ignored) {
+		this.ignored = new HashSet<>();
+		this.ignored.addAll(ignored);
 	}
 	
 	public String getStartNode() {

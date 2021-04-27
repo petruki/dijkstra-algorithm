@@ -7,9 +7,9 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 
@@ -68,7 +68,7 @@ public class DijkstraUtils {
 		Integer nodeId = 0;
 		String[][] matrix = new String[input.length][maxSizeY];
 		String startNode = null, endNode = null;
-		List<String> ignore = new ArrayList<>();
+		Set<String> ignore = new HashSet<>();
 		
 		for (int i = 0; i < input.length; i++) {
 			for (int j = 0; j < input[i].length(); j++, nodeId++) {

@@ -2,14 +2,16 @@ package com.github.petruki.app.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MatrixSettings implements Serializable {
 	
 	private static final long serialVersionUID = -422134078142927041L;
 	
-	private List<String> ignoredNodes = new ArrayList<>();
-	private List<String> path = new ArrayList<>();
+	private Set<String> ignoredNodes = new HashSet<>();
+	private Set<String> path = new HashSet<>();
 	private String nodeStart;
 	private String nodeEnd;
 	private float diagonalTrip;
@@ -29,12 +31,13 @@ public class MatrixSettings implements Serializable {
 		this.nodeEnd = null;
 	}
 	
-	public void updatePath(List<String> path) {
-		path.remove(0);
-		path.remove(path.size() - 1);
+	public void updatePath(Set<String> path) {
+		final List<String> tempList = new ArrayList<>(path);
+		tempList.remove(0);
+		tempList.remove(tempList.size() - 1);
 		
 		this.path.clear();
-		this.path.addAll(path);
+		this.path.addAll(tempList);
 	}
 	
 	public void updateIgnoreNodes(String nodeId) {
@@ -45,19 +48,19 @@ public class MatrixSettings implements Serializable {
 		}
 	}
 	
-	public List<String> getIgnoredNodes() {
+	public Set<String> getIgnoredNodes() {
 		return ignoredNodes;
 	}
 	
-	public void setIgnoredNodes(List<String> ignoredNodes) {
+	public void setIgnoredNodes(Set<String> ignoredNodes) {
 		this.ignoredNodes = ignoredNodes;
 	}
 	
-	public List<String> getPath() {
+	public Set<String> getPath() {
 		return path;
 	}
 	
-	public void setPath(List<String> path) {
+	public void setPath(Set<String> path) {
 		this.path = path;
 	}
 	
@@ -100,5 +103,5 @@ public class MatrixSettings implements Serializable {
 	public void setSizeY(int sizeY) {
 		this.sizeY = sizeY;
 	}
-
+	
 }

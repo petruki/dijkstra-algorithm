@@ -17,7 +17,7 @@ public class Vertex {
 	public Vertex(String node1, String node2) {
 		this.node1 = node1;
 		this.node2 = node2;
-		this.distance = Integer.MAX_VALUE;
+		this.distance = Long.MAX_VALUE;
 	}
 	
 	public Vertex(String neighbour, float distance) {
@@ -79,12 +79,20 @@ public class Vertex {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Vertex other = (Vertex) obj;
+		
+		final Vertex other = (Vertex) obj;
 		if (node1 == null) {
 			if (other.node1 != null)
 				return false;
 		} else if (!node1.equals(other.node1))
 			return false;
+		
+		if (node2 == null) {
+			if (other.node2 != null)
+				return false;
+		} else if (!node2.equals(other.node2))
+			return false;
+		
 		return true;
 	}
 	

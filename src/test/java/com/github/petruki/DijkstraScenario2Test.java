@@ -1,11 +1,11 @@
 package com.github.petruki;
 
+import static com.github.petruki.model.Vertex.get;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import static com.github.petruki.model.Vertex.get;
-
-import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ public class DijkstraScenario2Test {
 	 */   	 
 	@BeforeEach
 	void init() {  
-		List<Vertex> vertices = Arrays.asList(
+		Set<Vertex> vertices = Stream.of(
 			get("A", "B", 2),
 			get("A", "D", 3),
 			get("D", "B", 4),
@@ -44,7 +44,7 @@ public class DijkstraScenario2Test {
 			get("G", "H", 3),
 			get("G", "J", 2),
 			get("H", "J", 3)
-		);
+		).collect(Collectors.toSet());
 		
 		dijkstra = new Dijkstra(vertices);
 	}
@@ -78,7 +78,7 @@ public class DijkstraScenario2Test {
 	@Test
 	void testCaseJtoA_excludedRoute() throws Exception {
 		//given
-		List<Vertex> vertices = Arrays.asList(
+		Set<Vertex> vertices = Stream.of(
 				get("A", "B", 2),
 				get("A", "D", 3),
 				get("D", "B", 4),
@@ -95,8 +95,8 @@ public class DijkstraScenario2Test {
 				 * J to H is not allowed
 				 * only H -> J
 				 */
-				Vertex.get("H", "J", 3, false)
-			);
+				get("H", "J", 3, false)
+		).collect(Collectors.toSet());
 		
 		Dijkstra dijkstra = new Dijkstra(vertices);
 		

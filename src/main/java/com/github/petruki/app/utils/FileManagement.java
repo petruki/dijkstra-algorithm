@@ -62,7 +62,7 @@ public class FileManagement {
 	
 	public static MatrixSettings readWork(String destination) {
 		try (FileInputStream fin = new FileInputStream(destination);
-				ObjectInputStream ois = new ObjectInputStream(fin);) {
+				ObjectInputStream ois = new ObjectInputStream(fin)) {
 			return (MatrixSettings) ois.readObject();
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(
@@ -89,7 +89,7 @@ public class FileManagement {
 	
 	public static void saveWork(MatrixSettings matrixSettings, String destination) {
 		try (FileOutputStream fout = new FileOutputStream(destination);
-				ObjectOutputStream oos = new ObjectOutputStream(fout);) {
+				ObjectOutputStream oos = new ObjectOutputStream(fout)) {
 			oos.writeObject(matrixSettings);
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(

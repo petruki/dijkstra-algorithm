@@ -1,13 +1,13 @@
 package com.github.petruki;
 
+import static com.github.petruki.model.Vertex.get;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-import static com.github.petruki.model.Vertex.get;
-
-import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,14 +29,15 @@ public class DijkstraScenario1Test {
 	 */   	 
 	@BeforeEach
 	void init() {  
-		List<Vertex> vertices = Arrays.asList(
+		Set<Vertex> vertices = Stream.of(
 			get("A", "B", 6),
 			get("A", "D", 1),
 			get("B", "D", 2),
 			get("B", "E", 2),
 			get("B", "C", 5),
 			get("D", "E", 1),
-			get("E", "C", 5));
+			get("E", "C", 5))
+		.collect(Collectors.toSet());
 		
 		dijkstra = new Dijkstra(vertices);
 	}

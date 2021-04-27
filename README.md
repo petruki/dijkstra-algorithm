@@ -17,6 +17,7 @@ I have added a few features that can make more complex scenarios such as unidire
 	- Import plaintext or images
 - Display result table.
 - Display summary with visited nodes and total cost.
+- Real-time screen capture, why not?
 
 #### Density Matrix Simulator App
 

@@ -74,10 +74,10 @@ public class DensityMatrixApp extends JFrame {
 	private Options optionSelected = Options.UNSELECTED;
 	private JTextField txtTotalCost;
 	
-	private boolean capturing = true;
+	private boolean capturing = false;
 	
 	public DensityMatrixApp() {
-		setTitle("Density Matrix - Dijkstra Pathfinder");
+		setTitle("Density Matrix - Dijkstra Pathfinder v1.1.0");
 		setIconImage(LoadImage.load("end.png"));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 680, 600);

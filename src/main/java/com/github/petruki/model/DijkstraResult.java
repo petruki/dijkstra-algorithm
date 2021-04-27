@@ -1,16 +1,16 @@
 package com.github.petruki.model;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 
 public class DijkstraResult {
 	
 	public static final String RESULT_PATTERN = "%s -> %s: %s - cost: %s";
-	private List<String> path;
+	private Set<String> path;
 	private DijkstraTable dTable;
 	private String nodeDestination;
 
-	public DijkstraResult(List<String> path, DijkstraTable dTable, String nodeDestination) {
+	public DijkstraResult(Set<String> path, DijkstraTable dTable, String nodeDestination) {
 		this.path = path;
 		this.dTable = dTable;
 		this.nodeDestination = nodeDestination;
@@ -43,7 +43,7 @@ public class DijkstraResult {
 		}
 	}
 
-	public List<String> getPath() {
+	public Set<String> getPath() {
 		return path;
 	}
 
