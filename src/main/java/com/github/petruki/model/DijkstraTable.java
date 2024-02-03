@@ -10,11 +10,10 @@ import java.util.Map;
 import java.util.Set;
 
 public class DijkstraTable {
-	
 	private Map<String, List<Vertex>> paths;
 	private Set<Vertex> verticesTable;
 	private Set<String> visited;
-	private Set<String> ignored;
+	private final Set<String> ignored;
 	private Vertex[] sortedTable;
 	private final String nodeOrigin;
 	
@@ -33,7 +32,7 @@ public class DijkstraTable {
 		visited = new HashSet<>();
 		
 		if (ignored == null)
-			ignored = new HashSet<String>();
+			ignored = new HashSet<>();
 		
 		for (Vertex v : input) {
 			if (ignored.contains(v.getNode1()) || ignored.contains(v.getNode2()))
@@ -47,8 +46,9 @@ public class DijkstraTable {
 	
 	private void addPatch(String node, String neighbour, float distance) {
 		verticesTable.add(new Vertex(node, null));
-		if (!paths.containsKey(node))
+		if (paths.computeIfAbsent(node, k -> new ArrayList<>()).isEmpty()) {
 			paths.put(node, new ArrayList<>());
+		}
 		
 		paths.get(node).add(new Vertex(neighbour, distance));
 	}
@@ -95,7 +95,7 @@ public class DijkstraTable {
 	}
 	
 	public int compareDistance(Vertex v1, Vertex v2) {
-		return v1.getDistance() > v2.getDistance() ? 1 : 
+		return v1.getDistance() > v2.getDistance() ? 1 :
 			v1.getDistance() == v2.getDistance() ? 0 : -1;
 	}
 	

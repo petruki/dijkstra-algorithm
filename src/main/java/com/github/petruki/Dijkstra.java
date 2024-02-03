@@ -12,19 +12,19 @@ import com.github.petruki.model.Vertex;
 
 /**
  * Famous algrithm by Edsger W. Dijkstra.
- * 
- * Algorithm well explained here:
- * https://www.youtube.com/watch?v=pVfj6mxhdMw
- * 
+ * <p>
+ * Algorithm well explained
+ * <a href="https://www.youtube.com/watch?v=pVfj6mxhdMw">here</a>
+ * <p>
  * This implementation offers a wide view of how the algorithm works.
  * I have added a few features that can make more complex scenarios such as unidirectional vertices and density matrix for pathfinder simulation.
- * 
+ *
  * @author Roger Floriano (petruki)
  * @since 2021-04
  */
 public class Dijkstra {
 	
-	private Set<Vertex> vertices;
+	private final Set<Vertex> vertices;
 	private DijkstraTable dTable;
 	
 	public Dijkstra(Set<Vertex> vertices) {
@@ -40,8 +40,7 @@ public class Dijkstra {
 	 * Generates table containing all shortest path for each node
 	 * 
 	 * @param nodeOrigin which the algorithm should start calculating
-	 * @throws Exception 
-	 */
+     */
 	public void generateTable(String nodeOrigin) throws Exception {
 		this.generateTable(nodeOrigin, null);
 	}
@@ -51,8 +50,7 @@ public class Dijkstra {
 	 * 
 	 * @param nodeOrigin which the algorithm should start calculating
 	 * @param ignored nodes
-	 * @throws Exception 
-	 */
+     */
 	public void generateTable(String nodeOrigin, Set<String> ignored) throws Exception {
 		dTable = new DijkstraTable(vertices, ignored, nodeOrigin);
 		
@@ -66,8 +64,7 @@ public class Dijkstra {
 	 * Generates table containing all shortest path for each node
 	 * 
 	 * @param densityMatrix which contains all matrix information
-	 * @throws Exception 
-	 */
+     */
 	public void generateTable(DensityMatrix densityMatrix) throws Exception {
 		this.generateTable(densityMatrix.getStartNode(), densityMatrix.getIgnored());
 	}
@@ -76,50 +73,47 @@ public class Dijkstra {
 	 * Based on the generated table, find the shortest path
 	 * 
 	 * @return DijkstraResult that can be used to query results from the execution
-	 * @throws Exception 
-	 */
+     */
 	public DijkstraResult getShortestPath(String nodeDestination) throws Exception {
-		Set<String> path = buildPathNodeList(dTable.getNodeOrigin(), nodeDestination);
+		var path = buildPathNodeList(dTable.getNodeOrigin(), nodeDestination);
 		return new DijkstraResult(path, dTable, nodeDestination);
 	}
 
 	private void calculateShortestPath(Vertex vertex) {
-		for (Vertex edge : dTable.getPaths(vertex.getNode1())) {
-			Vertex adjacent = dTable.getAdjacent(edge.getNeighbour());
+		for (var edge : dTable.getPaths(vertex.getNode1())) {
+			var adjacent = dTable.getAdjacent(edge.getNeighbour());
 			
 			if (adjacent == null) continue;
 			compareDistances(vertex, edge, adjacent);
 		}
 	}
 
-	private float compareDistances(Vertex vertex, Vertex edge, Vertex adjacent) {
-		float distance = edge.getDistance() + vertex.getDistance();
+	private void compareDistances(Vertex vertex, Vertex edge, Vertex adjacent) {
+		var distance = edge.getDistance() + vertex.getDistance();
 		
 		if (distance > 0 && adjacent.getDistance() > distance) {
 			adjacent.setDistance(distance);
 			adjacent.setNode2(vertex.getNode1());
 		}
-		return distance;
 	}
 	
 	private Set<String> buildPathNodeList(String nodeOrigin, String nodeDest) 
 			throws Exception {
 		
-		final Vertex dstVertex = dTable.getVertices().stream()
+		final var dstVertex = dTable.getVertices().stream()
 				.filter(v -> v.getNode1().equals(nodeDest))
 				.findFirst().orElseThrow(() -> new Exception("Destination node not found"));
 		
 		if (nodeOrigin.equals(dstVertex.getNode2())) {
-			final Set<String> path = new LinkedHashSet<>();
+			final var path = new LinkedHashSet<String>();
 			path.add(dstVertex.getNode2());
 			return path;
 		}
 		
-		final Set<String> path = buildPathNodeList(nodeOrigin, dstVertex.getNode2());
-		if (!path.contains(dstVertex.getNode2()))
-			path.add(dstVertex.getNode2());
-		
+		final var path = buildPathNodeList(nodeOrigin, dstVertex.getNode2());
+        path.add(dstVertex.getNode2());
 		path.add(dstVertex.getNode1());
+
 		return path;
 	}
 	

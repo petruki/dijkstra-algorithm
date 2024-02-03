@@ -1,20 +1,16 @@
 package com.github.petruki;
 
-import static com.github.petruki.model.Vertex.get;
-
-import java.awt.Color;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.imageio.ImageIO;
-
 import com.github.petruki.model.DensityMatrix;
 import com.github.petruki.model.DijkstraResult;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.Arrays;
+import java.util.HashSet;
+
+import static com.github.petruki.model.Vertex.get;
 
 public class DijkstraUtils {
 	
@@ -22,9 +18,13 @@ public class DijkstraUtils {
 	private static final String X = "+";
 	private static final String S = "s";
 	private static final String E = "e";
+
+	private DijkstraUtils() {
+		// Utility class
+	}
 	
 	/**
-	 * Generates a Density Matrix baxed on sizeX (rows) and sizeY (columns).
+	 * Generates a Density Matrix based on sizeX (rows) and sizeY (columns).
 	 * 
 	 * @param sizeX rows
 	 * @param sizeY columns
@@ -34,8 +34,8 @@ public class DijkstraUtils {
 	public static DensityMatrix generateDensityMatrix(
 			int sizeX, int sizeY, float linearCost, float diagCost) {
 		
-		Integer nodeId = 0;
-		String[][] matrix = new String[sizeX][sizeY];
+		var nodeId = 0;
+		var matrix = new String[sizeX][sizeY];
 		
 		for (int i = 0; i < sizeX; i++) {
 			for (int j = 0; j < sizeY; j++) {
@@ -62,24 +62,29 @@ public class DijkstraUtils {
 			String[] input, float linearCost, float diagCost) {
 		
 		int maxSizeY = 0;
-		for (String s : input)
-			if (s.length() > 0) maxSizeY = s.length();
+		for (String s : input) {
+			if (!s.isEmpty()) {
+				maxSizeY = s.length();
+			}
+		}
 		
-		Integer nodeId = 0;
-		String[][] matrix = new String[input.length][maxSizeY];
-		String startNode = null, endNode = null;
-		Set<String> ignore = new HashSet<>();
+		var nodeId = 0;
+		var matrix = new String[input.length][maxSizeY];
+		var ignore = new HashSet<String>();
+
+		String startNode = null;
+		String endNode = null;
 		
 		for (int i = 0; i < input.length; i++) {
 			for (int j = 0; j < input[i].length(); j++, nodeId++) {
-				matrix[i][j] = nodeId.toString();
+				matrix[i][j] = String.valueOf(nodeId);
 				
 				if (input[i].charAt(j) == X.charAt(0))
-					ignore.add(nodeId.toString());
+					ignore.add(String.valueOf(nodeId));
 				else if (input[i].charAt(j) == S.charAt(0))
-					startNode = nodeId.toString();
+					startNode = String.valueOf(nodeId);
 				else if (input[i].charAt(j) == E.charAt(0)) {
-					endNode = nodeId.toString();
+					endNode = String.valueOf(nodeId);
 				}
 			}
 		}
@@ -109,20 +114,19 @@ public class DijkstraUtils {
 	 */
 	public static DensityMatrix generateDensityMatrix(
 			BufferedImage imageBuffer, int width, int height, int threshold,
-			float linearCost, float diagCost) 
-			throws Exception {
+			float linearCost, float diagCost) {
 		
-		BufferedImage resizedimage = resizeImage(imageBuffer, width, height);
+		var resizedImage = resizeImage(imageBuffer, width, height);
 
 		Color color;
-		final StringBuilder row = new StringBuilder();
-		final String[] input = new String[height];
+		final var row = new StringBuilder();
+		final var input = new String[height];
 		
-		for (int h = 0; h < resizedimage.getHeight(); h++) {
+		for (int h = 0; h < resizedImage.getHeight(); h++) {
 			
 			row.setLength(0);
-			for (int w = 0; w < resizedimage.getWidth(); w++) {					
-				color = new Color(resizedimage.getRGB(w, h));
+			for (int w = 0; w < resizedImage.getWidth(); w++) {
+				color = new Color(resizedImage.getRGB(w, h));
 				if (color.getRed() > threshold) {
 					row.append(A);			
 				} else {
@@ -140,7 +144,7 @@ public class DijkstraUtils {
 	public static DensityMatrix generateDensityMatrix(
 			String[][] matrix, float linearCost, float diagCost) {
 		
-		final DensityMatrix densityMatrix = new DensityMatrix();
+		final var densityMatrix = new DensityMatrix();
 		for (int row = 0; row < matrix.length; row++) {
 			for (int col = 0; col < matrix[row].length; col++) {
 				if (row > 0) {
@@ -176,15 +180,16 @@ public class DijkstraUtils {
 	public static void printResultDensityMatrix(
 			DijkstraResult result, DensityMatrix densityMatrix, boolean mask) {
 		
-		Integer nodeId = 0;
-		String[][] matrix = densityMatrix.getMatrix();;
+		var nodeId = 0;
+		var matrix = densityMatrix.getMatrix();
 		for (int row = 0; row < matrix.length; row++) {
 			for (int col = 0; col < matrix[row].length; col++, nodeId++) {
-				if (result.getDTable().getIgnored().contains(nodeId.toString())) {
+				final var nodeIdStr = String.valueOf(nodeId);
+				if (result.getDTable().getIgnored().contains(nodeIdStr)) {
 					matrix[row][col] = X;
 				} else {
-					matrix[row][col] = result.getPath().contains(nodeId.toString()) ? 
-							String.format("[%s]", mask ? "O" : nodeId) : mask ? "   " : nodeId.toString();					
+					matrix[row][col] = result.getPath().contains(nodeIdStr) ?
+							String.format("[%s]", mask ? "O" : nodeIdStr) : mask ? "   " : nodeIdStr;
 				}
 			}
 		}
@@ -196,7 +201,7 @@ public class DijkstraUtils {
 	}
 	
 	private static BufferedImage resizeImage(
-			BufferedImage originalImage, int targetWidth, int targetHeight) throws IOException {
+			BufferedImage originalImage, int targetWidth, int targetHeight) {
 	    Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
 	    BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
 	    outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);

@@ -29,7 +29,7 @@ public class MatrixRender implements TableCellRenderer {
 			JTable table, Object value, boolean isSelected, boolean hasFocus,
 			int row, int column) {
 
-		JPanel cell = new JPanel();
+		var cell = new JPanel();
 		cell.setBackground(Color.WHITE);
 		
 		if (selectedOption != null && isSelected && hasFocus) {

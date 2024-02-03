@@ -11,13 +11,13 @@ public abstract class MatrixEventHandler extends MouseAdapter {
 	
 	private final JTable table;
 	
-	public MatrixEventHandler(final JTable table) {
+	protected MatrixEventHandler(final JTable table) {
 		this.table = table;
 	}
 	
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		final String id = table.getModel().getValueAt(
+		final var id = table.getModel().getValueAt(
 				table.getSelectedRow(), table.getSelectedColumn()).toString();
 		
 		doRelease(new MatrixVertex(id, table.getSelectedRow(), table.getSelectedColumn()));
@@ -25,7 +25,7 @@ public abstract class MatrixEventHandler extends MouseAdapter {
 	
 	@Override
 	public void mousePressed(MouseEvent e) {
-		final String id = table.getModel().getValueAt(
+		final var id = table.getModel().getValueAt(
 				table.getSelectedRow(), table.getSelectedColumn()).toString();
 		
 		doPress(new MatrixVertex(id, table.getSelectedRow(), table.getSelectedColumn()));
@@ -33,7 +33,7 @@ public abstract class MatrixEventHandler extends MouseAdapter {
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		final String id = table.getModel().getValueAt(
+		final var id = table.getModel().getValueAt(
 				table.getSelectedRow(), table.getSelectedColumn()).toString();
 		
 		if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1)

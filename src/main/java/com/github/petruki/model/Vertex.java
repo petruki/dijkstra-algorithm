@@ -1,12 +1,11 @@
 package com.github.petruki.model;
 
 public class Vertex {
-	
+
 	private String node1;
 	private String node2;
 	private float distance;
 	private boolean bidirectional;
-	
 	public Vertex(String node1, String node2, float distance, boolean bidirectional) {
 		this.node1 = node1;
 		this.node2 = node2;
@@ -88,13 +87,9 @@ public class Vertex {
 			return false;
 		
 		if (node2 == null) {
-			if (other.node2 != null)
-				return false;
-		} else if (!node2.equals(other.node2))
-			return false;
-		
-		return true;
-	}
+            return other.node2 == null;
+		} else return node2.equals(other.node2);
+    }
 	
 	@Override
 	public String toString() {

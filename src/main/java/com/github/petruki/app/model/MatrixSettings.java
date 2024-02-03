@@ -1,13 +1,14 @@
 package com.github.petruki.app.model;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class MatrixSettings implements Serializable {
 	
+	@Serial
 	private static final long serialVersionUID = -422134078142927041L;
 	
 	private Set<String> ignoredNodes = new HashSet<>();
@@ -32,9 +33,9 @@ public class MatrixSettings implements Serializable {
 	}
 	
 	public void updatePath(Set<String> path) {
-		final List<String> tempList = new ArrayList<>(path);
-		tempList.remove(0);
-		tempList.remove(tempList.size() - 1);
+		final var tempList = new ArrayList<>(path);
+		tempList.removeFirst();
+		tempList.removeLast();
 		
 		this.path.clear();
 		this.path.addAll(tempList);
