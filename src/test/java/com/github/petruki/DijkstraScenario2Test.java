@@ -1,19 +1,15 @@
 package com.github.petruki;
 
-import static com.github.petruki.model.Vertex.get;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.github.petruki.model.DijkstraResult;
-import com.github.petruki.model.Vertex;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class DijkstraScenario2Test {
+import static com.github.petruki.model.Vertex.get;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class DijkstraScenario2Test {
 	
 	private Dijkstra dijkstra;
 	
@@ -31,7 +27,7 @@ public class DijkstraScenario2Test {
 	 */   	 
 	@BeforeEach
 	void init() {  
-		Set<Vertex> vertices = Stream.of(
+		var vertices = Stream.of(
 			get("A", "B", 2),
 			get("A", "D", 3),
 			get("D", "B", 4),
@@ -52,11 +48,11 @@ public class DijkstraScenario2Test {
 	@Test
 	void testCaseAtoJ() throws Exception {
 		//expected
-		String expected = "A -> J: [A, B, H, J] - cost: 8.0";
+		var expected = "A -> J: [A, B, H, J] - cost: 8.0";
 		
 		//test
 		dijkstra.generateTable("A");
-		DijkstraResult result = dijkstra.getShortestPath("J");
+		var result = dijkstra.getShortestPath("J");
 		
 		result.printResult(false);
 		assertEquals(expected, result.getResult());
@@ -65,11 +61,11 @@ public class DijkstraScenario2Test {
 	@Test
 	void testCaseJtoA() throws Exception {
 		//expected
-		String expected = "J -> A: [J, H, B, A] - cost: 8.0";
+		var expected = "J -> A: [J, H, B, A] - cost: 8.0";
 		
 		//test
 		dijkstra.generateTable("J");
-		DijkstraResult result = dijkstra.getShortestPath("A");
+		var result = dijkstra.getShortestPath("A");
 		
 		result.printResult(false);
 		assertEquals(expected, result.getResult());
@@ -78,7 +74,7 @@ public class DijkstraScenario2Test {
 	@Test
 	void testCaseJtoA_excludedRoute() throws Exception {
 		//given
-		Set<Vertex> vertices = Stream.of(
+		var vertices = Stream.of(
 				get("A", "B", 2),
 				get("A", "D", 3),
 				get("D", "B", 4),
@@ -98,14 +94,14 @@ public class DijkstraScenario2Test {
 				get("H", "J", 3, false)
 		).collect(Collectors.toSet());
 		
-		Dijkstra dijkstra = new Dijkstra(vertices);
+		var dijkstraLocal = new Dijkstra(vertices);
 		
 		//expected
-		String expected = "J -> A: [J, G, H, B, A] - cost: 10.0";
+		var expected = "J -> A: [J, G, H, B, A] - cost: 10.0";
 		
 		//test
-		dijkstra.generateTable("J");
-		DijkstraResult result = dijkstra.getShortestPath("A");
+		dijkstraLocal.generateTable("J");
+		var result = dijkstraLocal.getShortestPath("A");
 		
 		result.printResult(false);
 		assertEquals(expected, result.getResult());

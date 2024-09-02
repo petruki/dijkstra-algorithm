@@ -31,24 +31,25 @@ public class MatrixRender implements TableCellRenderer {
 
 		var cell = new JPanel();
 		cell.setBackground(Color.WHITE);
-		
+
 		if (selectedOption != null && isSelected && hasFocus) {
 			updateSelectionRender(value.toString());
 		}
-		
-		if (matrixSettings.getIgnoredNodes().contains(value.toString()))
-			cell.setBackground(Color.BLACK);
-		
-		else if (matrixSettings.getPath().contains(value.toString()))
-			cell.setBackground(Color.GREEN);
-		
-		else if (value.toString().equals(matrixSettings.getNodeStart())) {
-			cell.setBackground(Color.LIGHT_GRAY);
-			
-		} else if (value.toString().equals(matrixSettings.getNodeEnd()))
-			cell.setBackground(Color.GRAY);
 
+		setBackgroundColor(value, cell);
 		return cell;
+	}
+
+	private void setBackgroundColor(Object value, JPanel cell) {
+		if (matrixSettings.getIgnoredNodes().contains(value.toString())) {
+			cell.setBackground(Color.BLACK);
+		} else if (matrixSettings.getPath().contains(value.toString())) {
+			cell.setBackground(Color.GREEN);
+		} else if (value.toString().equals(matrixSettings.getNodeStart())) {
+			cell.setBackground(Color.LIGHT_GRAY);
+		} else if (value.toString().equals(matrixSettings.getNodeEnd())) {
+			cell.setBackground(Color.GRAY);
+		}
 	}
 
 	private void updateSelectionRender(String nodeId) {

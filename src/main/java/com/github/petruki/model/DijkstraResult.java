@@ -17,7 +17,7 @@ public class DijkstraResult {
 	}
 
 	public String getResult() {
-		Vertex vertexDest = dTable.getVertex(nodeDestination);
+		var vertexDest = dTable.getVertex(nodeDestination);
 		
 		if (vertexDest == null) {
 			throw new RuntimeException("Destination cannot be reached");
@@ -29,7 +29,7 @@ public class DijkstraResult {
 	}
 	
 	public void printResult(boolean printTable) {
-		System.out.println(String.format("\n%s", getResult()));
+		System.out.println("\n" + getResult());
 		
 		if (printTable) {
 			dTable.getVertices().stream().map(v -> {

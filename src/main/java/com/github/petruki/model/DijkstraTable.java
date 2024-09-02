@@ -31,16 +31,19 @@ public class DijkstraTable {
 		verticesTable = new HashSet<>();
 		visited = new HashSet<>();
 		
-		if (ignored == null)
+		if (ignored == null) {
 			ignored = new HashSet<>();
+		}
 		
 		for (Vertex v : input) {
-			if (ignored.contains(v.getNode1()) || ignored.contains(v.getNode2()))
+			if (ignored.contains(v.getNode1()) || ignored.contains(v.getNode2())) {
 				continue;
+			}
 			
 			addPatch(v.getNode1(), v.getNode2(), v.getDistance());
-			if (v.isBidirectional())
+			if (v.isBidirectional()) {
 				addPatch(v.getNode2(), v.getNode1(), v.getDistance());
+			}
 		}
 	}
 	
@@ -57,17 +60,17 @@ public class DijkstraTable {
 		verticesTable.stream()
 			.filter(v -> v.getNode1().equals(nodeOrigin))
 			.findFirst()
-			.orElseThrow(() -> new Exception("Node not foud")).setDistance(0);
+			.orElseThrow(() -> new Exception("Node not found")).setDistance(0);
 	}
 	
 	public Vertex getVertexUnvisited() {
-		return getVertexUnvisited_v2();
+		return getVertexUnvisitedV2();
 	}
 	
 	/**
 	 * Cleaner version of node/vertix search
 	 */
-	public Vertex getVertexUnvisited_v1() {
+	public Vertex getVertexUnvisitedV1() {
 		return verticesTable.stream()
 			.filter(v -> !visited.contains(v.getNode1()))
 			.min(Comparator.comparing(Vertex::getDistance))
@@ -78,9 +81,10 @@ public class DijkstraTable {
 	/**
 	 * This implementation can be +50% faster than the v1
 	 */
-	public Vertex getVertexUnvisited_v2() {
-		if (sortedTable == null)
+	public Vertex getVertexUnvisitedV2() {
+		if (sortedTable == null) {
 			sortedTable = verticesTable.toArray(new Vertex[0]);
+		}
 		
 		Arrays.parallelSort(sortedTable, this::compareDistance);
 		
@@ -95,8 +99,7 @@ public class DijkstraTable {
 	}
 	
 	public int compareDistance(Vertex v1, Vertex v2) {
-		return v1.getDistance() > v2.getDistance() ? 1 :
-			v1.getDistance() == v2.getDistance() ? 0 : -1;
+		return Float.compare(v1.getDistance(), v2.getDistance());
 	}
 	
 	public Vertex getVertex(String node) {
