@@ -17,27 +17,23 @@ public abstract class MatrixEventHandler extends MouseAdapter {
 	
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		final var id = table.getModel().getValueAt(
-				table.getSelectedRow(), table.getSelectedColumn()).toString();
-		
+		final var id = table.getModel().getValueAt(table.getSelectedRow(), table.getSelectedColumn()).toString();
 		doRelease(new MatrixVertex(id, table.getSelectedRow(), table.getSelectedColumn()));
 	}
 	
 	@Override
 	public void mousePressed(MouseEvent e) {
-		final var id = table.getModel().getValueAt(
-				table.getSelectedRow(), table.getSelectedColumn()).toString();
-		
+		final var id = table.getModel().getValueAt(table.getSelectedRow(), table.getSelectedColumn()).toString();
 		doPress(new MatrixVertex(id, table.getSelectedRow(), table.getSelectedColumn()));
 	}
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		final var id = table.getModel().getValueAt(
-				table.getSelectedRow(), table.getSelectedColumn()).toString();
+		final var id = table.getModel().getValueAt(table.getSelectedRow(), table.getSelectedColumn()).toString();
 		
-		if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1)
+		if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
 			doDoubleClick(new MatrixVertex(id, table.getSelectedRow(), table.getSelectedColumn()));
+		}
 	}
 	
 	public abstract void doRelease(MatrixVertex matrixVertex);

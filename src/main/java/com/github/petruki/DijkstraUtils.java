@@ -31,9 +31,7 @@ public class DijkstraUtils {
 	 * @param linearCost vertical/horizontal cost
 	 * @param diagCost diagonal cost. Negative numbers will make the connection being ignored
 	 */
-	public static DensityMatrix generateDensityMatrix(
-			int sizeX, int sizeY, float linearCost, float diagCost) {
-		
+	public static DensityMatrix generateDensityMatrix(int sizeX, int sizeY, float linearCost, float diagCost) {
 		var nodeId = 0;
 		var matrix = new String[sizeX][sizeY];
 		
@@ -58,9 +56,7 @@ public class DijkstraUtils {
 	 * @param linearCost vertical/horizontal cost
 	 * @param diagCost diagonal cost. Negative numbers will make the connection being ignored
 	 */
-	public static DensityMatrix generateDensityMatrix(
-			String[] input, float linearCost, float diagCost) {
-		
+	public static DensityMatrix generateDensityMatrix(String[] input, float linearCost, float diagCost) {
 		int maxSizeY = 0;
 		for (String s : input) {
 			if (!s.isEmpty()) {
@@ -102,10 +98,10 @@ public class DijkstraUtils {
 	 */
 	public static DensityMatrix generateDensityMatrix(
 			File inputImage, int width, int height, int threshold,
-			float linearCost, float diagCost) 
+			float linearCost, float diagCost)
 			throws Exception {
 		
-		BufferedImage originalImage = ImageIO.read(inputImage);
+		var originalImage = ImageIO.read(inputImage);
 		return generateDensityMatrix(originalImage, width, height, threshold, linearCost, diagCost);
 	}
 	
@@ -141,34 +137,29 @@ public class DijkstraUtils {
 	}
 
 	
-	public static DensityMatrix generateDensityMatrix(
-			String[][] matrix, float linearCost, float diagCost) {
-		
+	public static DensityMatrix generateDensityMatrix(String[][] matrix, float linearCost, float diagCost) {
 		final var densityMatrix = new DensityMatrix();
 		for (int row = 0; row < matrix.length; row++) {
 			for (int col = 0; col < matrix[row].length; col++) {
 				if (row > 0) {
-					densityMatrix.addVertex(
-							get(matrix[row][col], matrix[row-1][col], linearCost));
+					densityMatrix.addVertex(get(matrix[row][col], matrix[row-1][col], linearCost));
 					
-					if (col + 1 < matrix[row].length && diagCost > 0)
-						densityMatrix.addVertex(
-								get(matrix[row][col], matrix[row-1][col+1], diagCost));	
+					if (col + 1 < matrix[row].length && diagCost > 0) {
+						densityMatrix.addVertex(get(matrix[row][col], matrix[row-1][col+1], diagCost));
+					}
 				}
 				
 				if (col + 1 < matrix[row].length) {
-					densityMatrix.addVertex(
-							get(matrix[row][col], matrix[row][col+1], linearCost));
+					densityMatrix.addVertex(get(matrix[row][col], matrix[row][col+1], linearCost));
 				
-					if (row + 1 < matrix.length && diagCost > 0)
-						densityMatrix.addVertex(
-								get(matrix[row][col], matrix[row+1][col+1], diagCost));
+					if (row + 1 < matrix.length && diagCost > 0) {
+						densityMatrix.addVertex(get(matrix[row][col], matrix[row + 1][col + 1], diagCost));
+					}
 				}
 				
-				
-				if (row + 1 < matrix.length)
-					densityMatrix.addVertex(
-							get(matrix[row][col], matrix[row+1][col], linearCost));
+				if (row + 1 < matrix.length) {
+					densityMatrix.addVertex(get(matrix[row][col], matrix[row + 1][col], linearCost));
+				}
 			}
 		}
 		
@@ -177,9 +168,7 @@ public class DijkstraUtils {
 		return densityMatrix;
 	}
 	
-	public static void printResultDensityMatrix(
-			DijkstraResult result, DensityMatrix densityMatrix, boolean mask) {
-		
+	public static void printResultDensityMatrix(DijkstraResult result, DensityMatrix densityMatrix, boolean mask) {
 		var nodeId = 0;
 		var matrix = densityMatrix.getMatrix();
 		for (int row = 0; row < matrix.length; row++) {
@@ -200,10 +189,10 @@ public class DijkstraUtils {
 		});
 	}
 	
-	private static BufferedImage resizeImage(
-			BufferedImage originalImage, int targetWidth, int targetHeight) {
-	    Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
-	    BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+	private static BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) {
+	    var resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
+	    var outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+
 	    outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
 	    return outputImage;
 	}

@@ -26,8 +26,9 @@ public class FileManagement {
 		
 		@Override
 		public boolean accept(File f) {
-			if (f.isDirectory())
+			if (f.isDirectory()) {
 				return true;
+			}
 			return f.getName().toLowerCase().endsWith(".dmf");
 		}
 	};
@@ -40,8 +41,9 @@ public class FileManagement {
 		
 		@Override
 		public boolean accept(File f) {
-			if (f.isDirectory())
+			if (f.isDirectory()) {
 				return true;
+			}
 			return f.getName().toLowerCase().endsWith(".png") ||
 					f.getName().toLowerCase().endsWith(".jpg");
 		}
@@ -69,8 +71,7 @@ public class FileManagement {
 			 var ois = new ObjectInputStream(fin)) {
 			return (MatrixSettings) ois.readObject();
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(
-					null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
 		
 		return null;
@@ -96,8 +97,7 @@ public class FileManagement {
 			 var oos = new ObjectOutputStream(fout)) {
 			oos.writeObject(matrixSettings);
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(
-					null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	

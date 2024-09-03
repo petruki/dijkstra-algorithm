@@ -1,41 +1,5 @@
 package com.github.petruki.app;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.HeadlessException;
-import java.awt.MouseInfo;
-import java.awt.Rectangle;
-import java.awt.Robot;
-import java.awt.Toolkit;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.File;
-import java.io.IOException;
-
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.JSpinner;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.JToolBar;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
-import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.border.EmptyBorder;
-
 import com.github.petruki.Dijkstra;
 import com.github.petruki.DijkstraUtils;
 import com.github.petruki.app.matrix.MatrixEventHandler;
@@ -49,13 +13,25 @@ import com.github.petruki.app.utils.LoadImage;
 import com.github.petruki.model.DensityMatrix;
 import com.github.petruki.model.DijkstraResult;
 
+import javax.swing.*;
+import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.IOException;
+import java.util.Objects;
+
 /**
  * Simple app that displays the Density Matrix simulation using the Dijkstra algorithm
  * 
  * @author Roger Floriano (petruki)
  */
-@SuppressWarnings("serial")
 public class DensityMatrixApp extends JFrame {
+
+	public static final String ERROR_TITLE = "Error";
 
 	private JButton btnGenerate;
 	private JButton btnExecute;
@@ -63,14 +39,14 @@ public class DensityMatrixApp extends JFrame {
 	private JSpinner spinnerCols;
 	private JCheckBox chkDiagonalTrip;
 	private JProgressBar progressBar;
-	private JPanel contentPane;
+	private final JPanel contentPane;
 	private JTable matrix;
-	private MatrixRender matrixRender;
-	
-	private DensityMatrix densityMatrix;
+
+	private transient MatrixRender matrixRender;
+	private transient DensityMatrix densityMatrix;
+	private transient Dijkstra dijkstra;
+
 	private MatrixSettings matrixSettings;
-	
-	private Dijkstra dijkstra;
 	private Options optionSelected = Options.UNSELECTED;
 	private JTextField txtTotalCost;
 	
@@ -79,7 +55,7 @@ public class DensityMatrixApp extends JFrame {
 	public DensityMatrixApp() {
 		setTitle("Density Matrix - Dijkstra Pathfinder v1.1.0");
 		setIconImage(LoadImage.load("end.png"));
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setBounds(100, 100, 680, 600);
 		
 		buildMenu();
@@ -92,23 +68,23 @@ public class DensityMatrixApp extends JFrame {
 	}
 	
 	private void buildMenu() {
-		final JMenuBar menuBar = new JMenuBar();
+		final var menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 		
-		final JMenu mnNewMenu = new JMenu("Options");
+		final var mnNewMenu = new JMenu("Options");
 		menuBar.add(mnNewMenu);
 		
-		final JMenuItem menuNew = new JMenuItem("New");
+		final var menuNew = new JMenuItem("New");
 		menuNew.addActionListener(e -> initializeMatrix(true, false));
 		mnNewMenu.add(menuNew);
 		
-		final JMenuItem menuNewInverted = new JMenuItem("New Inverted");
+		final var menuNewInverted = new JMenuItem("New Inverted");
 		menuNewInverted.addActionListener(e -> initializeMatrix(true, true));
 		mnNewMenu.add(menuNewInverted);
 		
 		mnNewMenu.add(new JSeparator());
 		
-		final JMenuItem menuOpen = new JMenuItem("Open");
+		final var menuOpen = new JMenuItem("Open");
 		menuOpen.addActionListener(e -> {
 			matrixSettings = FileManagement.openReadWork();
 			if (matrixSettings != null) {
@@ -118,39 +94,31 @@ public class DensityMatrixApp extends JFrame {
 		});
 		mnNewMenu.add(menuOpen);
 		
-		final JMenuItem menuSave = new JMenuItem("Save");
+		final var menuSave = new JMenuItem("Save");
 		menuSave.addActionListener(e -> FileManagement.openSaveWork(matrixSettings));
 		mnNewMenu.add(menuSave);
 		
 		mnNewMenu.add(new JSeparator());
 		
-		final JMenuItem menuImportClipboard = new JMenuItem("Import Clipboard");
+		final var menuImportClipboard = new JMenuItem("Import Clipboard");
 		mnNewMenu.add(menuImportClipboard);
 		
-		menuImportClipboard.addActionListener(e -> {
-			try {	
-				onImportClipboard((String) Toolkit.getDefaultToolkit()
-				        .getSystemClipboard().getData(DataFlavor.stringFlavor));
-			} catch (HeadlessException | UnsupportedFlavorException | IOException ex) {
-				JOptionPane.showMessageDialog(
-						DensityMatrixApp.this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-			}
-		});
+		menuImportClipboard.addActionListener(this::actionPerformed);
 		
-		final JMenuItem menuImportImage = new JMenuItem("Import Image");
+		final var menuImportImage = new JMenuItem("Import Image");
 		menuImportImage.addActionListener(e -> onImportImage(FileManagement.openImage()));
 		mnNewMenu.add(menuImportImage);
 		
 		mnNewMenu.add(new JSeparator());
 		
-		final JMenuItem menuImportImageBuffer = new JMenuItem("Start Capturing");
+		final var menuImportImageBuffer = new JMenuItem("Start Capturing");
 		menuImportImageBuffer.addActionListener(e -> onImportImageBuffer());
 		mnNewMenu.add(menuImportImageBuffer);
 	}
 	
 	private void buildView() {
 		// Build bottom bar
-		final JPanel panel = new JPanel();
+		final var panel = new JPanel();
 		contentPane.add(panel, BorderLayout.SOUTH);
 		
 		btnGenerate = new JButton("Generate");
@@ -187,20 +155,20 @@ public class DensityMatrixApp extends JFrame {
 		chkDiagonalTrip.addActionListener(e -> btnExecute.setEnabled(false));
 		panel.add(chkDiagonalTrip);
 		
-		// Build side bar
-		JToolBar toolBar = new JToolBar();
+		// Build sidebar
+		var toolBar = new JToolBar();
 		toolBar.setFloatable(false);
 		toolBar.setOrientation(SwingConstants.VERTICAL);
 		contentPane.add(toolBar, BorderLayout.WEST);
 		
-		final JButton btnSelectStartNode = new JButton();
-		btnSelectStartNode.setIcon(new ImageIcon(LoadImage.load("start.png")));
+		final var btnSelectStartNode = new JButton();
+		btnSelectStartNode.setIcon(new ImageIcon(Objects.requireNonNull(LoadImage.load("start.png"))));
 
-		final JButton btnSelectEndNode = new JButton();
-		btnSelectEndNode.setIcon(new ImageIcon(LoadImage.load("end.png")));
+		final var btnSelectEndNode = new JButton();
+		btnSelectEndNode.setIcon(new ImageIcon(Objects.requireNonNull(LoadImage.load("end.png"))));
 
-		final JButton btnSelectIgnoreNode = new JButton();
-		btnSelectIgnoreNode.setIcon(new ImageIcon(LoadImage.load("ignore.png")));
+		final var btnSelectIgnoreNode = new JButton();
+		btnSelectIgnoreNode.setIcon(new ImageIcon(Objects.requireNonNull(LoadImage.load("ignore.png"))));
 
 		btnSelectStartNode.setToolTipText("Select the starting node");
 		btnSelectStartNode.setFocusable(false);
@@ -259,64 +227,65 @@ public class DensityMatrixApp extends JFrame {
 			@Override
 			public void doPress(MatrixVertex matrixVertex) {
 				if (optionSelected.equals(Options.SELECT_START) ||
-						optionSelected.equals(Options.SELECT_IGNORE))
+						optionSelected.equals(Options.SELECT_IGNORE)) {
 					btnExecute.setEnabled(false);
+				}
 				
 				matrixRender.setSelectedOption(optionSelected);
 			}
 
 			@Override
 			public void doDoubleClick(MatrixVertex matrixVertex) {
-				if (btnExecute.isEnabled())
+				if (btnExecute.isEnabled()) {
 					onExecute();
+				}
 			}
 		});
 	}
 	
 	private void centerUI() {
-		Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+		var dimension = Toolkit.getDefaultToolkit().getScreenSize();
 		int x = (int) ((dimension.getWidth() - getWidth()) / 2);
 		int y = (int) ((dimension.getHeight() - getHeight()) / 2);
 		setLocation(x, y);
 	}
 	
 	private void initializeMatrix(boolean newWork, boolean inverted) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				// configure matrix
-				densityMatrix = null;
-				
-				if (newWork) {
-					matrixSettings = new MatrixSettings(
-							Integer.valueOf(spinnerRows.getValue().toString()),
-							Integer.valueOf(spinnerCols.getValue().toString()),
-							chkDiagonalTrip.isSelected() ? 1.2f : -1);
-					
-					matrixSettings.resetMatrix();
-				} else {
-					spinnerRows.setValue(matrixSettings.getSizeX());
-					spinnerCols.setValue(matrixSettings.getSizeY());
-					chkDiagonalTrip.setSelected(matrixSettings.getDiagonalTrip() != -1);
-				}
-				
-				// initialize view
-				matrix.setModel(new MatrixModel().getTableModel(createMatrixIds(inverted)));
-				matrixRender = new MatrixRender(matrix, matrixSettings);
-				
-				// reset view
-				btnGenerate.setEnabled(true);
-				txtTotalCost.setText("");
+		EventQueue.invokeLater(() -> {
+			// configure matrix
+			densityMatrix = null;
+
+			if (newWork) {
+				matrixSettings = new MatrixSettings(
+						Integer.parseInt(spinnerRows.getValue().toString()),
+						Integer.parseInt(spinnerCols.getValue().toString()),
+						chkDiagonalTrip.isSelected() ? 1.2f : -1);
+
+				matrixSettings.resetMatrix();
+			} else {
+				spinnerRows.setValue(matrixSettings.getSizeX());
+				spinnerCols.setValue(matrixSettings.getSizeY());
+				chkDiagonalTrip.setSelected(matrixSettings.getDiagonalTrip() != -1);
 			}
+
+			// initialize view
+			matrix.setModel(new MatrixModel().getTableModel(createMatrixIds(inverted)));
+			matrixRender = new MatrixRender(matrix, matrixSettings);
+
+			// reset view
+			btnGenerate.setEnabled(true);
+			txtTotalCost.setText("");
 		});
 	}
 	
 	private String[][] createMatrixIds(boolean inverted) {
-		Integer nodeId = 0;
-		String[][] matrixIds = new String[matrixSettings.getSizeX()][matrixSettings.getSizeY()];
+		var nodeId = 0;
+		var matrixIds = new String[matrixSettings.getSizeX()][matrixSettings.getSizeY()];
 		for (int i = 0; i < matrixSettings.getSizeX(); i++) {
 			for (int j = 0; j < matrixSettings.getSizeY(); j++, nodeId++) {
-				if (inverted)
+				if (inverted) {
 					matrixSettings.getIgnoredNodes().add(String.valueOf(nodeId));
+				}
 				matrixIds[i][j] = String.valueOf(nodeId);
 			}
 		}
@@ -326,8 +295,8 @@ public class DensityMatrixApp extends JFrame {
 	
 	private void updateMatrixSettings() {
 		matrixSettings.setDiagonalTrip(chkDiagonalTrip.isSelected() ? 1.2f : -1);
-		matrixSettings.setSizeX(Integer.valueOf(spinnerRows.getValue().toString()));
-		matrixSettings.setSizeY(Integer.valueOf(spinnerCols.getValue().toString()));
+		matrixSettings.setSizeX(Integer.parseInt(spinnerRows.getValue().toString()));
+		matrixSettings.setSizeY(Integer.parseInt(spinnerCols.getValue().toString()));
 	}
 	
 	private void onGenerate() {
@@ -340,66 +309,60 @@ public class DensityMatrixApp extends JFrame {
 		progressBar.setVisible(true);
 		txtTotalCost.setVisible(false);
 		
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					updateMatrixSettings();
-					
-					if (densityMatrix == null) {
-						densityMatrix = DijkstraUtils.generateDensityMatrix(
-								createMatrixIds(false), 1f, matrixSettings.getDiagonalTrip());
-					} else {
-						densityMatrix = DijkstraUtils.generateDensityMatrix(
-								densityMatrix.getMatrix(), 1f, matrixSettings.getDiagonalTrip());
-						
-						spinnerRows.setValue(densityMatrix.getMatrix().length);
-						spinnerCols.setValue(densityMatrix.getMaxSizeY());
-					}
-					
-					dijkstra = new Dijkstra(densityMatrix.getVertices());
-					dijkstra.generateTable(matrixSettings.getNodeStart(), matrixSettings.getIgnoredNodes());
-					
-					// reset view
-					btnGenerate.setEnabled(true);
-					btnExecute.setEnabled(true);
-				} catch (Exception e) {
-					JOptionPane.showMessageDialog(
-							DensityMatrixApp.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-				} finally {
-					progressBar.setVisible(false);
-					txtTotalCost.setVisible(true);
-					txtTotalCost.setText("Matrix generated");
+		EventQueue.invokeLater(() -> {
+			try {
+				updateMatrixSettings();
+
+				if (densityMatrix == null) {
+					densityMatrix = DijkstraUtils.generateDensityMatrix(
+							createMatrixIds(false), 1f, matrixSettings.getDiagonalTrip());
+				} else {
+					densityMatrix = DijkstraUtils.generateDensityMatrix(
+							densityMatrix.getMatrix(), 1f, matrixSettings.getDiagonalTrip());
+
+					spinnerRows.setValue(densityMatrix.getMatrix().length);
+					spinnerCols.setValue(densityMatrix.getMaxSizeY());
 				}
+
+				dijkstra = new Dijkstra(densityMatrix.getVertices());
+				dijkstra.generateTable(matrixSettings.getNodeStart(), matrixSettings.getIgnoredNodes());
+
+				// reset view
+				btnGenerate.setEnabled(true);
+				btnExecute.setEnabled(true);
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(DensityMatrixApp.this, e.getMessage(), ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
+			} finally {
+				progressBar.setVisible(false);
+				txtTotalCost.setVisible(true);
+				txtTotalCost.setText("Matrix generated");
 			}
 		});
 	}
 	
 	private void onExecute() {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				DijkstraResult result;
-				try {
-					result = dijkstra.getShortestPath(matrixSettings.getNodeEnd());
-					
-					matrixSettings.updatePath(result.getPath());
-					txtTotalCost.setText(result.getResult());
-					matrix.repaint();
-				} catch (Exception e) {
-					JOptionPane.showMessageDialog(
-							DensityMatrixApp.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-				}
+		EventQueue.invokeLater(() -> {
+			DijkstraResult result;
+			try {
+				result = dijkstra.getShortestPath(matrixSettings.getNodeEnd());
+
+				matrixSettings.updatePath(result.getPath());
+				txtTotalCost.setText(result.getResult());
+				matrix.repaint();
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(DensityMatrixApp.this, e.getMessage(), ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
 			}
 		});
 	}
 	
 	private void onImportClipboard(String input) {
-    	if (input == null || input.length() <= 0)
-    		return;
+    	if (input == null || input.isEmpty()) {
+			return;
+		}
     	
 		// compile text input
-		final String[] inpput = input.split("\n");
-		densityMatrix =
-				DijkstraUtils.generateDensityMatrix(inpput, 1f, matrixSettings.getDiagonalTrip());
+		final var inputArr = input.split("\n");
+		densityMatrix = DijkstraUtils.generateDensityMatrix(inputArr, 1f, matrixSettings.getDiagonalTrip());
 		
 		matrixSettings.resetMatrix();
 		matrixSettings.setNodeStart(densityMatrix.getStartNode());
@@ -412,20 +375,22 @@ public class DensityMatrixApp extends JFrame {
 	}
 	
 	private void onImportImage(File input) {
-    	if (input == null)
-    		return;
+    	if (input == null) {
+			return;
+		}
     	
     	try {
-    		String thresholdLevel = JOptionPane.showInputDialog("Detail level (0-255)", "190");
-    		if (thresholdLevel == null || thresholdLevel.length() == 0)
-    			thresholdLevel = "190";
+    		var thresholdLevel = JOptionPane.showInputDialog("Detail level (0-255)", "190");
+    		if (thresholdLevel == null || thresholdLevel.isEmpty()) {
+				thresholdLevel = "190";
+			}
     		
     		// generate density matrix from image
 			densityMatrix = DijkstraUtils.generateDensityMatrix(
 					input, 
-					Integer.valueOf(spinnerCols.getValue().toString()), 
-					Integer.valueOf(spinnerRows.getValue().toString()), 
-					Integer.valueOf(thresholdLevel), 1f, matrixSettings.getDiagonalTrip());
+					Integer.parseInt(spinnerCols.getValue().toString()),
+					Integer.parseInt(spinnerRows.getValue().toString()),
+					Integer.parseInt(thresholdLevel), 1f, matrixSettings.getDiagonalTrip());
 			
 			matrixSettings.resetMatrix();
 			matrixSettings.setIgnoredNodes(densityMatrix.getIgnored());
@@ -435,8 +400,7 @@ public class DensityMatrixApp extends JFrame {
 			matrixRender = new MatrixRender(matrix, matrixSettings);
 			matrix.repaint();
     	} catch (Exception e) {
-    		JOptionPane.showMessageDialog(
-					DensityMatrixApp.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    		JOptionPane.showMessageDialog(DensityMatrixApp.this, e.getMessage(), ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
@@ -444,68 +408,74 @@ public class DensityMatrixApp extends JFrame {
 		JOptionPane.showConfirmDialog(this, 
 				"Place your mouse cursor at the start and press ok.", "Find Start", 
 				JOptionPane.OK_CANCEL_OPTION);
-		final int xStartPos = MouseInfo.getPointerInfo().getLocation().x;
-		final int yStartPos = MouseInfo.getPointerInfo().getLocation().y;
+		final var xStartPos = MouseInfo.getPointerInfo().getLocation().x;
+		final var yStartPos = MouseInfo.getPointerInfo().getLocation().y;
 	    
 	    JOptionPane.showConfirmDialog(this, 
 				"Place your mouse cursor at the end and press ok.", "Find End", 
 				JOptionPane.OK_CANCEL_OPTION);
-	    final int xEndPos = MouseInfo.getPointerInfo().getLocation().x;
-	    final int yEndPos = MouseInfo.getPointerInfo().getLocation().y;
+	    final var xEndPos = MouseInfo.getPointerInfo().getLocation().x;
+	    final var yEndPos = MouseInfo.getPointerInfo().getLocation().y;
 	    
-	    int thresholdLevel = Integer.parseInt(JOptionPane.showInputDialog("Detail level (0-255)", 190));
+	    var thresholdLevel = Integer.parseInt(JOptionPane.showInputDialog("Detail level (0-255)", 190));
 		
     	try {
-    		Robot robot = new Robot();
-    	    int width = (xEndPos - xStartPos), height = (yEndPos - yStartPos);
-    	    Rectangle area = new Rectangle(xStartPos, yStartPos, width, height);
+    		var robot = new Robot();
+    	    var width = (xEndPos - xStartPos);
+			var height = (yEndPos - yStartPos);
+    	    var area = new Rectangle(xStartPos, yStartPos, width, height);
     	    
-    	    final int sampleCols = Integer.valueOf(spinnerCols.getValue().toString());
-    	    final int sampleRows = Integer.valueOf(spinnerRows.getValue().toString());
+    	    final int sampleCols = Integer.parseInt(spinnerCols.getValue().toString());
+    	    final int sampleRows = Integer.parseInt(spinnerRows.getValue().toString());
  
-    	    new Thread() {
-    	    	public void run() {
-    	    	    capturing = true;
-    	    	    btnGenerate.setText("Stop Capture");
-    	    	    
-    	    		final MatrixRender matrixRender = new MatrixRender(matrix, matrixSettings);
-    	    		
-    	    	    while (capturing) {
-    	    	    	try {
-							densityMatrix = DijkstraUtils.generateDensityMatrix(
-									robot.createScreenCapture(area), 
-									sampleCols, 
-									sampleRows, thresholdLevel, 1f, -1f);
-	    	    	    	
-	    	    	    	matrixSettings.setIgnoredNodes(densityMatrix.getIgnored());
-	    	    	    	matrixRender.setMatrixSettings(matrixSettings);
-	    	    	    	matrix.repaint();
-	    	    	    	Thread.sleep(20);
-    	    	    	} catch (Exception e) {}
-    	    	    }
-    	    	}
-    	    }.start();
+    	    new Thread(() -> {
+				capturing = true;
+				btnGenerate.setText("Stop Capture");
+
+				matrixRender = new MatrixRender(matrix, matrixSettings);
+
+				while (capturing) {
+					try {
+						densityMatrix = DijkstraUtils.generateDensityMatrix(
+								robot.createScreenCapture(area),
+								sampleCols,
+								sampleRows, thresholdLevel, 1f, -1f);
+
+						matrixSettings.setIgnoredNodes(densityMatrix.getIgnored());
+						matrixRender.setMatrixSettings(matrixSettings);
+						matrix.repaint();
+						Thread.sleep(20);
+					} catch (Exception ignored) {
+						Thread.currentThread().interrupt();
+					}
+				}
+			}).start();
 
     	} catch (Exception e) {
-    		JOptionPane.showMessageDialog(
-					DensityMatrixApp.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    		JOptionPane.showMessageDialog(DensityMatrixApp.this, e.getMessage(), ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	private void actionPerformed(ActionEvent e) {
+		try {
+			onImportClipboard((String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor));
+		} catch (HeadlessException | UnsupportedFlavorException | IOException ex) {
+			JOptionPane.showMessageDialog(DensityMatrixApp.this, ex.getMessage(), ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
 	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-				        if ("Nimbus".equals(info.getName())) {
-				            UIManager.setLookAndFeel(info.getClassName());
-				            break;
-				        }
-				    }
-					new DensityMatrixApp().setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
+		EventQueue.invokeLater(() -> {
+			try {
+				for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+					if ("Nimbus".equals(info.getName())) {
+						UIManager.setLookAndFeel(info.getClassName());
+						break;
+					}
 				}
+				new DensityMatrixApp().setVisible(true);
+			} catch (Exception e) {
+				System.err.println(e.getMessage());
 			}
 		});
 	}

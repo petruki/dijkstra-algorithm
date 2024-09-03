@@ -1,21 +1,21 @@
 package com.github.petruki;
 
-import static com.github.petruki.model.Vertex.get;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import com.github.petruki.model.DijkstraResult;
+import com.github.petruki.model.Vertex;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static com.github.petruki.model.Vertex.get;
+import static org.junit.jupiter.api.Assertions.*;
 
-import com.github.petruki.model.DijkstraResult;
-import com.github.petruki.model.Vertex;
-
-public class DijkstraScenario1Test {
+class DijkstraScenario1Test {
 	
 	private Dijkstra dijkstra;
 
@@ -41,88 +41,40 @@ public class DijkstraScenario1Test {
 		
 		dijkstra = new Dijkstra(vertices);
 	}
-	
-	@Test
-	void testCaseAtoC() throws Exception {
-		//expected
-		String expected = "A -> C: [A, D, E, C] - cost: 7.0";
-		
-		//test
-		dijkstra.generateTable("A");
-		DijkstraResult result = dijkstra.getShortestPath("C");
-		
+
+	static Stream<Arguments> shortestPathArguments() {
+		return Stream.of(
+			Arguments.of("A", "C", "A -> C: [A, D, E, C] - cost: 7.0"),
+			Arguments.of("C", "A", "C -> A: [C, E, D, A] - cost: 7.0"),
+			Arguments.of("A", "B", "A -> B: [A, D, B] - cost: 3.0"),
+			Arguments.of("B", "A", "B -> A: [B, D, A] - cost: 3.0"),
+			Arguments.of("A", "E", "A -> E: [A, D, E] - cost: 2.0")
+		);
+	}
+
+	@ParameterizedTest
+	@MethodSource("shortestPathArguments")
+	void testShortestPath(String origin, String destination, String expected) throws Exception {
+		dijkstra.generateTable(origin);
+		var result = dijkstra.getShortestPath(destination);
+
 		result.printResult(false);
 		assertEquals(expected, result.getResult());
 	}
-	
-	@Test
-	void testCaseCtoA() throws Exception {
-		//expected
-		String expected = "C -> A: [C, E, D, A] - cost: 7.0";
-		
-		//test
-		dijkstra.generateTable("C");
-		DijkstraResult result = dijkstra.getShortestPath("A");
-		
-		result.printResult(false);
-		assertEquals(expected, result.getResult());
-	}
-	
-	@Test
-	void testCaseAtoB() throws Exception {
-		//expected
-		String expected = "A -> B: [A, D, B] - cost: 3.0";
-		
-		//test
-		dijkstra.generateTable("A");
-		DijkstraResult result = dijkstra.getShortestPath("B");
-		
-		result.printResult(false);
-		assertEquals(expected, result.getResult());
-	}
-	
-	@Test
-	void testCaseBtoA() throws Exception {
-		//expected
-		String expected = "B -> A: [B, D, A] - cost: 3.0";
-		
-		//test
-		dijkstra.generateTable("B");
-		DijkstraResult result = dijkstra.getShortestPath("A");
-		
-		result.printResult(false);
-		assertEquals(expected, result.getResult());
-	}
-	
-	@Test
-	void testCaseAtoE() throws Exception {
-		//expected
-		String expected = "A -> E: [A, D, E] - cost: 2.0";
-		
-		//test
-		dijkstra.generateTable("A");
-		DijkstraResult result = dijkstra.getShortestPath("E");
-		
-		result.printResult(false);
-		assertEquals(expected, result.getResult());
-	}
-	
+
 	@Test
 	void testInvalidOriginNode() {
-		Exception expectedExc = assertThrows(Exception.class, 
-				() -> dijkstra.generateTable("INVALID"));
-		
-		assertEquals(expectedExc.getMessage(), "Node not foud");
+		var expectedExc = assertThrows(Exception.class, () -> dijkstra.generateTable("INVALID"));
+
+		assertEquals("Node not found", expectedExc.getMessage());
 	}
-	
+
 	@Test
 	void testInvalidDestinationNode() {
 		assertDoesNotThrow(() -> dijkstra.generateTable("A"));
-		
-		Exception expectedExc = assertThrows(Exception.class, 
-				() -> dijkstra.getShortestPath("INVALID_NODE"));
-		
-		assertEquals(expectedExc.getMessage(), "Destination node not found");
+		var expectedExc = assertThrows(Exception.class, () -> dijkstra.getShortestPath("INVALID_NODE"));
+
+		assertEquals("Destination node not found", expectedExc.getMessage());
 	}
 
 }
