@@ -35,9 +35,9 @@
 		<maven.compiler.source>21</maven.compiler.source>
 		<maven.compiler.target>21</maven.compiler.target>
 
-		<junit.version>5.11.0</junit.version>
-		<maven-surefire-plugin.version>3.5.0</maven-surefire-plugin.version>
-		<maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+		<junit.version>5.13.0</junit.version>
+		<maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
+		<maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
 		<maven-shade-plugin.version>3.6.0</maven-shade-plugin.version>
 	</properties>
 
